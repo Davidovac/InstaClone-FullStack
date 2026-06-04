@@ -18,11 +18,11 @@ namespace InstaClone.Infrastructure.Services
         private readonly string _audience;
         private readonly SymmetricSecurityKey _key;
 
-        public TokenService(IConfiguration config)
+        public TokenService(IServedAppSettings servedAppSettings)
         {
-            _issuer = config["JwtSettings:Issuer"];
-            _audience = config["JwtSettings:Audience"];
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtSettings:Secret"]));
+            _issuer = servedAppSettings.JWTIssuer;
+            _audience = servedAppSettings.JWTAudience;
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(servedAppSettings.JWTSecret));
         }
         public string CreateToken(User user, List<string> roles)
         {

@@ -7,6 +7,7 @@ using InstaClone.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System.Text;
 
 namespace InstaClone.Application.Services
@@ -18,17 +19,17 @@ namespace InstaClone.Application.Services
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IConfiguration _configuration;
+        private readonly IServedAppSettings _servedAppSettings;
         private readonly IEmailSender _emailSender;
 
-        public AuthService(UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, ITokenService tokenService, IUnitOfWork unitOfWork, IConfiguration configuration, IEmailSender emailSender)
+        public AuthService(UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, ITokenService tokenService, IUnitOfWork unitOfWork, IServedAppSettings servedAppSettings, IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _mapper = mapper;
             _tokenService = tokenService;
             _unitOfWork = unitOfWork;
-            _configuration = configuration;
+            _servedAppSettings = servedAppSettings;
             _emailSender = emailSender;
         }
 
@@ -75,8 +76,6 @@ namespace InstaClone.Application.Services
                 throw new BadRequestException("ERROR: Something went wrong while creating the account.");
             }
 
-            await _unitOfWork.CompleteAsync();
-
             await SendActivationEmailAsync(user);
         }
 
@@ -87,7 +86,7 @@ namespace InstaClone.Application.Services
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 var tokenBytes = Encoding.UTF8.GetBytes(token);
                 var encodedToken = WebEncoders.Base64UrlEncode(tokenBytes);
-                var frontendUrl = _configuration["FrontendBaseUrl"];
+                var frontendUrl = _servedAppSettings.FrontendBaseUrl;
 
                 if (string.IsNullOrEmpty(frontendUrl))
                 {

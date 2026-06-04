@@ -27,9 +27,9 @@ namespace InstaClone.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOneAsync(Guid id)
         {
-            var users = await _userService.GetByIdAsync(id);
+            var user = await _userService.GetByIdAsync(id);
 
-            return Ok(users);
+            return Ok(user);
         }
     }
 }

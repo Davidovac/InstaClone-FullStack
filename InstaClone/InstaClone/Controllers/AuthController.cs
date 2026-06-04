@@ -18,6 +18,7 @@ namespace InstaClone.Api.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> LoginAsync([FromBody] LoginRequestDto loginRequest)
         {
             LoginResponseDto loginResponseDto = await _authService.LoginAsync(loginRequest);
@@ -26,6 +27,7 @@ namespace InstaClone.Api.Controllers
         }
 
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterRequestDto registerRequest)
         {
             await _authService.RegisterAsync(registerRequest);
@@ -33,9 +35,9 @@ namespace InstaClone.Api.Controllers
             return Ok();
         }
 
-        [HttpGet("activate-account")]
+        [HttpPost("activate-account")]
         [AllowAnonymous]
-        public async Task<IActionResult> ActivateAccountAsync([FromQuery] ActivateAccountRequestDto activateRequest)
+        public async Task<IActionResult> ActivateAccountAsync([FromBody] ActivateAccountRequestDto activateRequest)
         {
             await _authService.ActivateAccountAsync(activateRequest);
 

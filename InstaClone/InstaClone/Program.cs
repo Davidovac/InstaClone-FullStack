@@ -1,5 +1,6 @@
 using AutoMapper;
 using InstaClone.Api.Middleware;
+using InstaClone.Application;
 using InstaClone.Application.Interfaces;
 using InstaClone.Application.Mappings;
 using InstaClone.Application.Services;
@@ -85,17 +86,8 @@ try
                     };
                 });
 
-    builder.Services.AddScoped<IAuthService, AuthService>();
-    builder.Services.AddScoped<ITokenService, TokenService>();
-    builder.Services.AddScoped<IUserService, UserService>();
-    builder.Services.Configure<EmailSenderSettings>(builder.Configuration.GetSection(EmailSenderSettings.SectionName));
-    builder.Services.AddScoped<IEmailSender, EmailSender>();
-    builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-    builder.Services.AddAutoMapper(cfg =>
-    {
-        cfg.AddMaps(typeof(UserMappings).Assembly);
-    });
+    builder.Services.AddApplication();
+    builder.Services.AddInfrastructure(builder.Configuration);
 
     var app = builder.Build();
 
