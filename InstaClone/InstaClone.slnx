@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="InstaClone.Application/InstaClone.Application.csproj" Id="6cf6857d-a351-4d97-bdc8-890f2abf965a" />
+  <Project Path="InstaClone.Domen/InstaClone.Domain.csproj" Id="f3ef03e6-8191-4a86-9640-ff7c85ab3c10" />
+  <Project Path="InstaClone.Infrastructure/InstaClone.Infrastructure.csproj" Id="ed37c88b-9453-465b-ae71-9f1d9bd5506c" />
+  <Project Path="InstaClone/InstaClone.Api.csproj" />
+</Solution>
