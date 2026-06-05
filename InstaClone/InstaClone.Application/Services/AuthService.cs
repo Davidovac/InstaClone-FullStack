@@ -2,11 +2,11 @@
 using InstaClone.Application.DTOs.AuthDTOs;
 using InstaClone.Application.Exceptions;
 using InstaClone.Application.Interfaces;
+using InstaClone.Application.Settings;
 using InstaClone.Domain.Entities;
 using InstaClone.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System.Text;
 
@@ -19,18 +19,18 @@ namespace InstaClone.Application.Services
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IServedAppSettings _servedAppSettings;
+        private readonly IOptions<FrontendOptions> _frontendOptions;
         private readonly IEmailSender _emailSender;
 
-        public AuthService(UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, ITokenService tokenService, IUnitOfWork unitOfWork, IServedAppSettings servedAppSettings, IEmailSender emailSender)
+        public AuthService(UserManager<User> userManager, SignInManager<User> signInManager, IMapper mapper, ITokenService tokenService, IUnitOfWork unitOfWork, IOptions<FrontendOptions> frontendOptions, IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _mapper = mapper;
             _tokenService = tokenService;
             _unitOfWork = unitOfWork;
-            _servedAppSettings = servedAppSettings;
             _emailSender = emailSender;
+            _frontendOptions = frontendOptions;
         }
 
         public async Task<LoginResponseDto> LoginAsync(LoginRequestDto loginRequest)
@@ -86,7 +86,7 @@ namespace InstaClone.Application.Services
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 var tokenBytes = Encoding.UTF8.GetBytes(token);
                 var encodedToken = WebEncoders.Base64UrlEncode(tokenBytes);
-                var frontendUrl = _servedAppSettings.FrontendBaseUrl;
+                var frontendUrl = _frontendOptions.Value.FrontendBaseUrl;
 
                 if (string.IsNullOrEmpty(frontendUrl))
                 {

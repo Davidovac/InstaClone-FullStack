@@ -2,8 +2,10 @@
 using InstaClone.Domain.Interfaces;
 using InstaClone.Infrastructure.Services;
 using InstaClone.Infrastructure.Settings;
+using Microsoft.AspNetCore.Builder.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,17 +22,21 @@ namespace InstaClone.Infrastructure
             services.Configure<EmailSenderSettings>(configuration.GetSection(EmailSenderSettings.SectionName));
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            var bundledSettings = new ServedAppSettings
-            {
-                DefaultConnectionString = configuration.GetSection("ConnectionStrings:DefaultConnection").Value ?? string.Empty,
-                FrontendBaseUrl = configuration.GetSection("FrontendBaseUrl").Value ?? string.Empty,
-                JWTIssuer = configuration.GetSection("JWT:Issuer").Value ?? string.Empty,
-                JWTAudience = configuration.GetSection("JWT:Audience").Value ?? string.Empty,
-                JWTSecret = configuration.GetSection("JWT:Secret").Value ?? string.Empty,
-                EmailSenderApiKey = configuration.GetSection("EmailSender:ApiKey").Value ?? string.Empty
-            };
 
-            services.AddSingleton<IServedAppSettings>(bundledSettings);
+            services.Configure<ConnectionOptions>(
+                configuration.GetSection("ConnectionStrings"));
+            services.AddTransient<IConnectionOptions>(provider =>
+            provider.GetRequiredService<IOptions<ConnectionOptions>>().Value);
+
+            services.Configure<JwtOptions>(
+                configuration.GetSection("JwtSettings"));
+            services.AddTransient<IJwtOptions>(provider =>
+            provider.GetRequiredService<IOptions<JwtOptions>>().Value);
+
+            services.Configure<EmailSenderOptions>(
+                configuration.GetSection("EmailSenderSettings"));
+            services.AddTransient<IEmailSenderOptions>(provider =>
+            provider.GetRequiredService<IOptions<EmailSenderOptions>>().Value);
 
             return services;
         }

@@ -1,6 +1,7 @@
 using AutoMapper;
 using InstaClone.Api.Middleware;
 using InstaClone.Application;
+using InstaClone.Application.Exceptions;
 using InstaClone.Application.Interfaces;
 using InstaClone.Application.Mappings;
 using InstaClone.Application.Services;
@@ -37,6 +38,20 @@ try
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
+
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+    if (connectionString == null || connectionString == "" || connectionString.Length < 10)
+    {
+        throw new InvalidOperationException("Connection string 'DefaultConnection' is missing or invalid");
+    }
+
+    var issuer = builder.Configuration["JwtSettings:Issuer"];
+
+    if (issuer == null || issuer == "")
+    {
+        throw new InvalidOperationException("JwtSettings:Issuer is missing");
+    }
 
     builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")).UseSnakeCaseNamingConvention()
@@ -86,7 +101,7 @@ try
                     };
                 });
 
-    builder.Services.AddApplication();
+    builder.Services.AddApplication(builder.Configuration);
     builder.Services.AddInfrastructure(builder.Configuration);
 
     var app = builder.Build();

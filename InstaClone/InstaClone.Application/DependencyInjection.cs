@@ -1,6 +1,8 @@
 ﻿using InstaClone.Application.Interfaces;
 using InstaClone.Application.Mappings;
 using InstaClone.Application.Services;
+using InstaClone.Application.Settings;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -13,7 +15,7 @@ namespace InstaClone.Application
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddApplication(this IServiceCollection services)
+        public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddAutoMapper(cfg =>
             {
@@ -21,6 +23,8 @@ namespace InstaClone.Application
             });
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
+            services.Configure<FrontendOptions>(
+                 configuration.GetSection("FrontendBaseUrl"));
 
             return services;
         }

@@ -1,6 +1,8 @@
 ﻿using InstaClone.Application.Interfaces;
 using InstaClone.Domain.Entities;
+using InstaClone.Infrastructure.Settings;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -18,11 +20,11 @@ namespace InstaClone.Infrastructure.Services
         private readonly string _audience;
         private readonly SymmetricSecurityKey _key;
 
-        public TokenService(IServedAppSettings servedAppSettings)
+        public TokenService(IOptions<JwtOptions> jwtOptions)
         {
-            _issuer = servedAppSettings.JWTIssuer;
-            _audience = servedAppSettings.JWTAudience;
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(servedAppSettings.JWTSecret));
+            _issuer = jwtOptions.Value.Issuer;
+            _audience = jwtOptions.Value.Audience;
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Value.Secret));
         }
         public string CreateToken(User user, List<string> roles)
         {
