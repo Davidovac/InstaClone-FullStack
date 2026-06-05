@@ -24,7 +24,7 @@ namespace InstaClone.Application
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
             services.Configure<FrontendOptions>(
-                 configuration.GetSection("FrontendBaseUrl"));
+                 configuration.GetSection("FrontendOptions"));
 
             return services;
         }

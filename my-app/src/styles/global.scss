@@ -42,6 +42,13 @@ a, th {
   margin: 0.4rem 0;
 }
 
+@mixin container-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 //SPINNER
 .spinner-container {
     @include container-column;

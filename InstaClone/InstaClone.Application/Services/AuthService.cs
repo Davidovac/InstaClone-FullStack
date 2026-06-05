@@ -66,9 +66,21 @@ namespace InstaClone.Application.Services
 
         public async Task RegisterAsync(RegisterRequestDto registerRequest)
         {
+            bool isPasswordValid = registerRequest.ValidatePassword();
+            if (!isPasswordValid)
+                throw new BadRequestException("ERROR: Password does not meet the required criteria.");
+
             User user = _mapper.Map<User>(registerRequest);
 
             user.EmailConfirmed = false;
+
+            bool emailExists = await _userManager.FindByEmailAsync(registerRequest.Email) != null;
+            if (emailExists)
+                throw new BadRequestException("ERROR: An account with this email already exists.");
+
+            bool usernameExists = await _userManager.FindByNameAsync(registerRequest.UserName) != null;
+            if (usernameExists)
+                throw new BadRequestException("ERROR: A user with this username already exists.");
 
             var createResult = await _userManager.CreateAsync(user, registerRequest.Password);
             if (!createResult.Succeeded)
