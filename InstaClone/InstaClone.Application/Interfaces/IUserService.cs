@@ -1,0 +1,16 @@
+﻿using InstaClone.Application.DTOs;
+using InstaClone.Application.DTOs.UserDTOs;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace InstaClone.Application.Interfaces
+{
+    public interface IUserService
+    {
+        Task<IReadOnlyList<UserDto>> GetAllAsync();
+        Task<UserDto?> GetByIdAsync(Guid id);
+    }
+}
