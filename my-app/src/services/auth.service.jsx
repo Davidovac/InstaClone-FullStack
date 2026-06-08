@@ -32,5 +32,22 @@ export const authService = {
     }
 
     return await api.post(`/auth/activate-account`, activationData);
+  },
+
+  forgotPassword: async (data) => {
+
+    return await api.post("/auth/forgot-password", { email: data.email });
+  },
+
+  resetPassword: async (data) => {
+
+    const resetPasswordData = {
+      email: data.email,
+      token: data.token,
+      newPassword: data.newPassword,
+      confirmPassword: data.confirmPassword
+    }
+
+    return await api.post("/auth/reset-password", resetPasswordData);
   }
 }

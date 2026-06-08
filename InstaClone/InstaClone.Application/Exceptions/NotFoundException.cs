@@ -8,7 +8,7 @@ namespace InstaClone.Application.Exceptions
 {
     public class NotFoundException : Exception
     {
-        public NotFoundException(string message) : base(message + " not found")
+        public NotFoundException(string message) : base("ERROR: " + message + " not found!")
         {
 
         }

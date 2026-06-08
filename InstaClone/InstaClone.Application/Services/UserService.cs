@@ -27,29 +27,12 @@ namespace InstaClone.Application.Services
         public async Task<IReadOnlyList<UserDto>> GetAllAsync()
         {
             var users = await _userManager.Users.ToListAsync();
-
-            var response = new List<UserDto>();
-
-            foreach (var u in users)
-            {
-                var roles = await _userManager.GetRolesAsync(u);
-                response.Add(new UserDto
-                {
-                    Id = u.Id,
-                    UserName = u.UserName,
-                    Email = u.Email,
-                    FirstName = u.FirstName,
-                    LastName = u.LastName,
-                    Roles = roles
-                });
-            }
-
-            return response;
+            return _mapper.Map<IReadOnlyList<UserDto>>(users);
         }
 
         public async Task<UserDto?> GetByIdAsync(Guid id)
         {
-            var user = _userManager.FindByIdAsync(id.ToString());
+            var user = await _userManager.FindByIdAsync(id.ToString());
 
             if (user == null)
                 throw new NotFoundException("User was not found.");

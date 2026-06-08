@@ -7,13 +7,22 @@ using System.Threading.Tasks;
 
 namespace InstaClone.Application.DTOs.AuthDTOs
 {
-    public class ActivateAccountRequestDto
+    public class ResetPasswordRequestDto
     {
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+
         [Required]
-        [MinLength(15)]
         public string Token { get; set; }
+
+        [Required]
+        [DataType(DataType.Password)]
+        public string NewPassword { get; set; }
+
+        [Required]
+        [DataType(DataType.Password)]
+        [Compare("NewPassword", ErrorMessage = "Passwords don't match.")]
+        public string ConfirmPassword { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useLogin } from "../../hooks/useAuthQueries";
 import "./LoginPage.module.scss";
 
@@ -9,7 +9,7 @@ const LoginPage = () => {
   const { mutate: login, isPending: isSaving, isError: isLoginError, error: loginError } = useLogin();
   const navigate = useNavigate();
 
-  const onLogin = async (payload) => {
+  const onLogin = async (payload, e) => {
     e.preventDefault();
     login(payload, {
       onSuccess: () => {
@@ -34,6 +34,9 @@ const LoginPage = () => {
         </div>
         <button>Login</button>
       </form>
+      <p className="forgot-password">
+        <Link to="/forgot-password">Zaboravili ste lozinku?</Link>
+      </p>
       {isLoginError && <p style={{ color: 'red' }}>{loginError.message}</p>}
     </div>
   );

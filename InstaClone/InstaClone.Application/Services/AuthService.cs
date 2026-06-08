@@ -35,22 +35,22 @@ namespace InstaClone.Application.Services
 
         public async Task<LoginResponseDto> LoginAsync(LoginRequestDto loginRequest)
         {
-            var user = await _userManager.FindByEmailAsync(loginRequest.Email);
+            var user = await _userManager.FindByNameAsync(loginRequest.UserName);
             if (user == null)
             {
-                throw new BadRequestException("ERROR: Invalid username or password.");
+                throw new BadRequestException("Invalid username or password.");
             }
 
             var emailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
             if (emailConfirmed == false)
             {
-                throw new BadRequestException("ERROR: Please confirm your email address before logging in.");
+                throw new BadRequestException("Please confirm your email address before logging in.");
             }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginRequest.Password, lockoutOnFailure: false);
             if (!result.Succeeded)
             {
-                throw new BadRequestException("ERROR: Invalid username or password.");
+                throw new BadRequestException("Invalid username or password.");
             }
 
             var roles = await _userManager.GetRolesAsync(user);
@@ -68,7 +68,7 @@ namespace InstaClone.Application.Services
         {
             bool isPasswordValid = registerRequest.ValidatePassword();
             if (!isPasswordValid)
-                throw new BadRequestException("ERROR: Password does not meet the required criteria.");
+                throw new BadRequestException("Password does not meet the required criteria.");
 
             User user = _mapper.Map<User>(registerRequest);
 
@@ -76,16 +76,16 @@ namespace InstaClone.Application.Services
 
             bool emailExists = await _userManager.FindByEmailAsync(registerRequest.Email) != null;
             if (emailExists)
-                throw new BadRequestException("ERROR: An account with this email already exists.");
+                throw new BadRequestException("An account with this email already exists.");
 
             bool usernameExists = await _userManager.FindByNameAsync(registerRequest.UserName) != null;
             if (usernameExists)
-                throw new BadRequestException("ERROR: A user with this username already exists.");
+                throw new BadRequestException("A user with this username already exists.");
 
             var createResult = await _userManager.CreateAsync(user, registerRequest.Password);
             if (!createResult.Succeeded)
             {
-                throw new BadRequestException("ERROR: Something went wrong while creating the account.");
+                throw new BadRequestException("Something went wrong while creating the account.");
             }
 
             await SendActivationEmailAsync(user);
@@ -124,13 +124,13 @@ namespace InstaClone.Application.Services
         {
             if (string.IsNullOrEmpty(activateRequest.Email) || string.IsNullOrEmpty(activateRequest.Token))
             {
-                throw new BadRequestException("Email i token su obavezni.");
+                throw new BadRequestException("Email and token are required.");
             }
 
             var user = await _userManager.FindByEmailAsync(activateRequest.Email);
             if (user == null)
             {
-                throw new NotFoundException("Korisnik nije pronađen.");
+                throw new NotFoundException("User");
             }
 
             var tokenBytes = WebEncoders.Base64UrlDecode(activateRequest.Token);
@@ -140,7 +140,80 @@ namespace InstaClone.Application.Services
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                throw new BadRequestException($"Aktivacija nije uspela: {errors}");
+                throw new BadRequestException($"Activation failed: {errors}");
+            }
+        }
+
+        public async Task ForgotPasswordAsync(ForgotPasswordRequestDto forgotRequest)
+        {
+            if (string.IsNullOrEmpty(forgotRequest.Email))
+            {
+                throw new BadRequestException("Email is required.");
+            }
+
+            var user = await _userManager.FindByEmailAsync(forgotRequest.Email);
+
+            if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+            {
+                throw new NotFoundException("User");
+            }
+
+            try
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+                var tokenBytes = Encoding.UTF8.GetBytes(token);
+                var encodedToken = WebEncoders.Base64UrlEncode(tokenBytes);
+
+                var frontendUrl = _frontendOptions.Value.FrontendBaseUrl;
+                if (string.IsNullOrEmpty(frontendUrl))
+                {
+                    throw new InvalidOperationException("FrontendBaseUrl isn't configured in appsettings.");
+                }
+
+                var resetLink = $"{frontendUrl}/reset-password?email={user.Email}&token={encodedToken}";
+
+                var emailSubject = "Resetovanje Lozinke - Delivery App";
+                var htmlMessage = $@"
+                <h1>Zahtev za resetovanje lozinke</h1>
+                <p>Dobili smo zahtev za resetovanje Vaše lozinke. Ako niste Vi podneli ovaj zahtev, ignorišite ovaj email.</p>
+                <p>Za promenu lozinke, kliknite na link ispod:</p>
+                <a href='{resetLink}' style='padding: 10px 15px; background-color: #dc3545; color: white; text-decoration: none; border-radius: 5px;'>
+                    Resetuj Lozinku
+                </a>
+                <br>
+                <p>Ako link ne radi, iskopirajte ovu adresu u Vaš pretraživač:</p>
+                <p>{resetLink}</p>";
+
+                await _emailSender.SendEmailAsync(user.Email, emailSubject, htmlMessage);
+            }
+            catch (Exception ex)
+            {
+                return;
+            }
+        }
+
+        public async Task ResetPasswordAsync(ResetPasswordRequestDto resetRequest)
+        {
+            if (resetRequest == null || string.IsNullOrEmpty(resetRequest.Email) || string.IsNullOrEmpty(resetRequest.Token))
+            {
+                throw new BadRequestException("Invalid request.");
+            }
+            var user = await _userManager.FindByEmailAsync(resetRequest.Email);
+
+            if (user == null)
+            {
+                throw new BadRequestException("Unsuccessful password change. Try again.");
+            }
+
+            var tokenBytes = WebEncoders.Base64UrlDecode(resetRequest.Token);
+            var decodedToken = Encoding.UTF8.GetString(tokenBytes);
+
+            var result = await _userManager.ResetPasswordAsync(user, decodedToken, resetRequest.NewPassword);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new BadRequestException($"Unsuccessful password change: {errors}");
             }
         }
     }

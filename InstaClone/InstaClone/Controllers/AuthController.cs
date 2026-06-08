@@ -44,13 +44,22 @@ namespace InstaClone.Api.Controllers
             return Ok(new { Message = "Account has been activated successfully." });
         }
 
-        /*[HttpPost("forgot-password")]
+        [HttpPost("forgot-password")]
         [AllowAnonymous]
         public async Task<IActionResult> ForgotPasswordAsync([FromBody] ForgotPasswordRequestDto forgotRequest)
         {
             await _authService.ForgotPasswordAsync(forgotRequest);
 
             return Ok(new { Message = "Please check your email in order to reset your password." });
-        }*/
+        }
+
+        [HttpPost("reset-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPasswordAsync([FromBody] ResetPasswordRequestDto resetRequest)
+        {
+            await _authService.ResetPasswordAsync(resetRequest);
+
+            return Ok(new { Message = "Password changed successfully. You may now log in." });
+        }
     }
 }
