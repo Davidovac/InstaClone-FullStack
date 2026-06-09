@@ -13,5 +13,8 @@ namespace InstaClone.Application.Interfaces
         Task RegisterAsync(RegisterRequestDto registerRequest);
         Task<LoginResponseDto> LoginAsync(LoginRequestDto loginRequest);
         Task ActivateAccountAsync(ActivateAccountRequestDto activateRequest);
+        Task ForgotPasswordAsync(ForgotPasswordRequestDto forgotRequest);
+        Task ResetPasswordAsync(ResetPasswordRequestDto resetRequest);
+
     }
 }
