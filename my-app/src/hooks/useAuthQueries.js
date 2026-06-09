@@ -1,21 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { useAuthStore } from '../store/useAuthStore';
-
-const errorHandler = (error) => {
-  const backendMessage = error.response?.status && error.response?.status != 500 ? error.response?.data?.detail : "Server error";
-  console.error(backendMessage);
-  return backendMessage;
-}
+import { errorHandler } from './handlers/errorHandler';
 
 export function useLogin() {
   const queryClient = useQueryClient();
   const setAuth = useAuthStore((state) => state.setAuth);
   
   return useMutation({
-    mutationFn: async ({ userName, password }) => {
+    mutationFn: async (data) => {
       try {
-        return await authService.login(userName, password);
+        return await authService.login(data);
       } catch (error) {
         throw new Error(errorHandler(error));
       }
@@ -33,9 +28,9 @@ export function useRegister() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ userName, password, email, firstName, lastName }) => {
+    mutationFn: async (data) => {
       try {
-        return await authService.register(userName, password, email, firstName, lastName);
+        return await authService.register(data);
       } catch (error) {
         throw new Error(errorHandler(error));
       }
@@ -54,9 +49,9 @@ export function useActivateAccount() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ email, token }) => {
+    mutationFn: async (data) => {
       try {
-        return await authService.activateAccount(email, token);
+        return await authService.activateAccount(data);
       } catch (error) {
         throw new Error(errorHandler(error));
       }

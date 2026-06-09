@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import { useActivateAccount } from "../../hooks/useAuthQueries";
 import { LoadingSpinner } from "../../components/LoadingSpinner/LoadingSpinner";
+import styles from "./ActivateAccount.module.scss";
 
 const ActivateAccount = () => {
   const navigate = useNavigate();

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using InstaClone.Application.DTOs.AuthDTOs;
+using InstaClone.Application.DTOs.UserDTOs;
 using InstaClone.Application.Exceptions;
 using InstaClone.Application.Interfaces;
 using InstaClone.Application.Settings;
@@ -58,7 +59,8 @@ namespace InstaClone.Application.Services
 
             var loginResponse = new LoginResponseDto
             {
-                Token = token
+                Token = token,
+                User = _mapper.Map<UserDto>(user)   
             };
 
             return loginResponse;

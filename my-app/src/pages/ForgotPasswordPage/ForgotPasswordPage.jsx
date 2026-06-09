@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useForgotPassword } from "../../hooks/useAuthQueries";
 import { LoadingSpinner } from "../../components/LoadingSpinner/LoadingSpinner";
+import styles from "./ForgotPasswordPage.module.scss";
 
 const ForgotPasswordPage = () => {
   const { register, handleSubmit, formState } = useForm();
