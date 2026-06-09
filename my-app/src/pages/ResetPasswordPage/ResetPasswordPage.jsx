@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import { useResetPassword } from "../../hooks/useAuthQueries";
-import { LoadingSpinner } from "../../components/LoadingSpinner/LoadingSpinner";
+import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import styles from "./ResetPasswordPage.module.scss";
 
 const ResetPasswordPage = () => {

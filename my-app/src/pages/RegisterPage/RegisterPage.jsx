@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useRegister } from "../../hooks/useAuthQueries";
-import { LoadingSpinner } from "../../components/LoadingSpinner/LoadingSpinner";
+import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import styles from "./RegisterPage.module.scss";
 
 const RegisterPage = () => {

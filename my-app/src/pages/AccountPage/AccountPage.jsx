@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useUpdateUser, useDeleteUser } from "../../hooks/useUserQueries";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
-import { LoadingSpinner } from "../../components/LoadingSpinner/LoadingSpinner";
+import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 
 const AccountPage = () => {
   const navigate = useNavigate();

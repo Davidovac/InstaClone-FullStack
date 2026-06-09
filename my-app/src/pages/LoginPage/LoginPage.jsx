@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { useLogin } from "../../hooks/useAuthQueries";
-import { LoadingSpinner } from "../../components/LoadingSpinner/LoadingSpinner";
+import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner.jsx"
 import styles from "./LoginPage.module.scss";
 
 const LoginPage = () => {

@@ -43,13 +43,6 @@ a, th {
   margin: 0.4rem 0;
 }
 
-@mixin container-column {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
 table {
   border-collapse: collapse;
   width: 100%;
