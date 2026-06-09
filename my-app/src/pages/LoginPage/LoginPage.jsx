@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { useLogin } from "../../hooks/useAuthQueries";
-import "./LoginPage.module.scss";
+import { LoadingSpinner } from "../../components/LoadingSpinner/LoadingSpinner";
+import styles from "./LoginPage.module.scss";
 
 const LoginPage = () => {
   const { register, handleSubmit, formState } = useForm();
@@ -19,7 +20,7 @@ const LoginPage = () => {
     });
   };
 
-  if (isSaving) return <div id="loadingSpinner" className="spinner"></div>;
+  if (isSaving) return <LoadingSpinner />;
   return(
     <div id="login-container">
       <h2>Login</h2>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import { useActivateAccount } from "../../hooks/useAuthQueries";
+import { LoadingSpinner } from "../../components/LoadingSpinner/LoadingSpinner";
 
 const ActivateAccount = () => {
   const navigate = useNavigate();
@@ -22,6 +23,8 @@ const ActivateAccount = () => {
       });
     }
   }, [token, email]);
+
+  if (isActivating) return <LoadingSpinner />
 
   return (
     <div id="activate-account-container" style={{ width: '100%', textAlign: 'center', padding: '20px', paddingTop: '30vh' }}>

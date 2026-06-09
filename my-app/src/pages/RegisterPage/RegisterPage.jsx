@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useRegister } from "../../hooks/useAuthQueries";
-import "./RegisterPage.module.scss";
+import { LoadingSpinner } from "../../components/LoadingSpinner/LoadingSpinner";
+import styles from "./RegisterPage.module.scss";
 
 const RegisterPage = () => {
   const { register, handleSubmit, formState } = useForm();
@@ -41,7 +42,7 @@ const RegisterPage = () => {
   || !/[a-z]/.test(formState.values.password) || !/[!@#$%^&*(),.?":{}|<>]/.test(formState.values.password));
 
 
-  if (isSaving) return <div id="loadingSpinner" className="spinner"></div>;
+  if (isSaving) return <LoadingSpinner />;
   return(
     <div id="login-container">
       <h2>Register</h2>
