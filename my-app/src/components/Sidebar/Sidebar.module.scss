@@ -1,0 +1,61 @@
+.navListDown, .navListUpper {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  li {
+    margin: 0 0.5rem;
+    padding: 0.3rem 1rem;
+    border-radius: 10px;
+    transition: 0.3s ease;
+    &:hover {
+      background-color: rgb(184, 145, 178);
+      a {
+        color: rgba(222, 202, 247, 0.925);
+      }
+    }
+  }
+}
+
+a {
+  color: rgb(195, 201, 240);
+  text-decoration: none;
+  font-size: larger;
+
+  &:hover {
+    color: rgba(195, 201, 240, 0.575);
+  }
+}
+
+.navItem {
+  h2 {
+    margin: 0;
+    color: rgb(231, 208, 219);
+  }
+}
+
+.container {
+  height: 100%;
+  display: flex;
+  nav {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background-color: rgb(104, 78, 99);
+    .navListUpper {
+
+    }
+
+    .navListDown {
+      flex-direction: row;
+      justify-content: center;
+    }
+  }
+}
+
+.active {
+  background-color: rgb(184, 145, 178);
+}

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useForgotPassword } from "../../hooks/useAuthQueries";
-import "./ForgotPasswordPage.module.scss";
+import { LoadingSpinner } from "../../components/LoadingSpinner/LoadingSpinner";
 
 const ForgotPasswordPage = () => {
   const { register, handleSubmit, formState } = useForm();
@@ -14,7 +14,7 @@ const ForgotPasswordPage = () => {
     forgotPassword(payload);
   };
 
-  if (isSaving) return <div id="loadingSpinner" className="spinner"></div>;
+  if (isSaving) return <LoadingSpinner />
   return(
     <div id="forgot-password-container">
       <h2>Forgot Password</h2>

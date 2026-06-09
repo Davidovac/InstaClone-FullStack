@@ -3,7 +3,8 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import { useResetPassword } from "../../hooks/useAuthQueries";
-import "./ResetPasswordPage.module.scss";
+import { LoadingSpinner } from "../../components/LoadingSpinner/LoadingSpinner";
+import styles from "./ResetPasswordPage.module.scss";
 
 const ResetPasswordPage = () => {
   const [searchParams] = useSearchParams();
@@ -24,7 +25,7 @@ const ResetPasswordPage = () => {
     });
   };
 
-  if (isSaving) return <div id="loadingSpinner" className="spinner"></div>;
+  if (isSaving) return <LoadingSpinner />;
   return(
     <div id="reset-password-container">
       <h2>Reset Password</h2>
