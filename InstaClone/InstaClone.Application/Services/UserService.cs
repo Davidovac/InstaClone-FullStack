@@ -30,7 +30,7 @@ namespace InstaClone.Application.Services
             return _mapper.Map<IReadOnlyList<UserDto>>(users);
         }
 
-        public async Task<UserDto?> GetByIdAsync(Guid id)
+        public async Task<UserDto> GetByIdAsync(Guid id)
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
 
@@ -41,7 +41,7 @@ namespace InstaClone.Application.Services
             return userDto;
         }
 
-        public async Task<UserDto?> UpdateAsync(Guid id, UserUpdateRequestDto userData)
+        public async Task<UserDto> UpdateAsync(Guid id, UserUpdateRequestDto userData)
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null)
@@ -63,7 +63,12 @@ namespace InstaClone.Application.Services
             if (user == null)
                 throw new NotFoundException("User was not found.");
 
-            await _userManager.DeleteAsync(user);
+            var result = await _userManager.DeleteAsync(user);
+
+            if (!result.Succeeded)
+            {
+                throw new BadRequestException("User deletion failed.");
+            }
         }
     }
 }
