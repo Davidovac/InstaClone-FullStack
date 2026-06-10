@@ -11,11 +11,8 @@ const SearchBar = ({ onSubmit }) => {
 
   return (
     <form className={styles.wrapper} onSubmit={handleSubmit}>
-      <input 
-        type="text"
-        name="search"
-        placeholder="Search..."
-      />
+
+      <input type="text" name="search" placeholder="Search..."/>
       <button type="submit">Search</button>
     </form>
   );

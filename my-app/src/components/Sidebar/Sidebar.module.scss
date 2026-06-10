@@ -6,16 +6,7 @@
   list-style: none;
   padding: 0;
   li {
-    margin: 0 0.5rem;
-    padding: 0.3rem 1rem;
-    border-radius: 10px;
-    transition: 0.3s ease;
-    &:hover {
-      background-color: rgb(184, 145, 178);
-      a {
-        color: rgba(222, 202, 247, 0.925);
-      }
-    }
+    margin: 0.8rem;
   }
 }
 
@@ -23,9 +14,14 @@ a {
   color: rgb(195, 201, 240);
   text-decoration: none;
   font-size: larger;
+  padding: 0.3rem 1rem;
+  border-radius: 10px;
+  margin: 0 0.5rem;
+  transition: 0.3s ease;
 
   &:hover {
-    color: rgba(195, 201, 240, 0.575);
+    color: rgba(222, 202, 247, 0.925);
+    background-color: rgb(184, 145, 178);
   }
 }
 
@@ -56,6 +52,19 @@ a {
   }
 }
 
+
 .active {
   background-color: rgb(184, 145, 178);
+}
+  
+
+.homePageLink {
+  margin: 0;
+  padding: 0;
+  height: fit-content;
+  font-size: medium;
+  h2 {
+    padding: 0;
+    margin: 0;
+  }
 }

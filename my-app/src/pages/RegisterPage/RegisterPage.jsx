@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useRegister } from "../../hooks/useAuthQueries";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import styles from "./RegisterPage.module.scss";
+import InputComponent from "../../components/InputComponent/InputComponent.jsx"
 
 const RegisterPage = () => {
   const { register, handleSubmit, watch, formState: {errors, dirtyFields} } = useForm({
@@ -11,7 +12,7 @@ const RegisterPage = () => {
   });
   const { mutate: registerUser, isPending: isSaving, isError: isRegisterError, error: registerError } = useRegister();
   const navigate = useNavigate();
-  const password = watch("password", "");
+  const password = watch("password");
 
   const onRegister = async (data) => {
     const payload = {
@@ -30,23 +31,32 @@ const RegisterPage = () => {
     });
   };
 
+  const confirmPassValidate = {
+    matchesPassword: value => value === password || "Passwords do not match",
+  }
+
+  const passwordValidation = {
+    hasNumber: value => /\d/.test(value) || "Must contain a number",
+    hasUpper: value => /[A-Z]/.test(value) || "Must contain an uppercase letter",
+    hasLower: value => /[a-z]/.test(value) || "Must contain a lowercase letter",
+    hasSpecial: value => /[!@#$%^&*(),.?":{}|<>]/.test(value) || "Must contain a special character",
+  }
+
 
   if (isSaving) return <LoadingSpinner />;
   return(
     <div id="login-container">
       <h2>Register</h2>
       <form onSubmit={handleSubmit(onRegister)}>
-        <div>
-          <label>Username:</label>
-          <input type="text" {...register("userName", { required: "Username is required"})} />
-          {errors.userName && <p style={{ color: 'red' }}>{errors.userName.message}</p>}
-        </div>
-        <div>
-          <label>email:</label>
-          <input type="email" {...register("email", { required: "Email is required"})} />
-          {errors.email && <p style={{ color: 'red' }}>{errors.email.message}</p>}
-        </div>
-        <div>
+        <InputComponent iName="userName" label="Username" iType="text"
+          register={register}
+          errors={errors}
+        />
+        <InputComponent iName="email" iType="email" label="Email"
+          register={register}
+          errors={errors}
+        />
+        {/*<div>
           <label>Password:</label>
           <input type="password" {...register("password", {
             required: "Password is required",
@@ -59,25 +69,31 @@ const RegisterPage = () => {
             },
           })} />
           {errors.password && <p style={{ color: 'red' }}>{errors.password.message}</p>}
-        </div>
-        <div>
-          <label>Confirm Password:</label>
-          <input type="password" {...register("confirmPassword", {
-            required: "Password confirmation is required",
-            validate: value => value === password || "Passwords do not match"
-          })} />
-          {errors.confirmPassword && <p style={{ color: 'red' }}>{errors.confirmPassword.message}</p>}
-        </div>
-        <div>
-          <label>First Name:</label>
-          <input type="text" {...register("firstName", { required: "Name is required"})} />
-          {errors.firstName && <p style={{ color: 'red' }}>{errors.firstName.message}</p>}
-        </div>
-        <div>
-          <label>Last Name:</label>
-          <input type="text" {...register("lastName", { required: "Last name is required"})} />
-          {errors.lastName && <p style={{ color: 'red' }}>{errors.lastName.message}</p>}
-        </div>
+
+        </div>*/}
+        <InputComponent iName="password" label="Password" iType="password"
+          validateShow={true}
+          validateObj={passwordValidation}
+          register={register}
+          errors={errors}
+        />
+
+        <InputComponent iName="confirmPassword" label="Confirm Password" iType="password"
+          validateShow={true}
+          validateObj={confirmPassValidate}
+          register={register}
+          errors={errors}
+        />
+
+        <InputComponent iName="firstName" label="First Name" iType="text"
+          register={register}
+          errors={errors}
+        />
+
+        <InputComponent iName="lastName" label="Last Name" iType="text"
+          register={register}
+          errors={errors}
+        />
         {isRegisterError && <p style={{ color: 'red' }}>{registerError.message}</p>}
         <button type="submit">Register</button>
       </form>

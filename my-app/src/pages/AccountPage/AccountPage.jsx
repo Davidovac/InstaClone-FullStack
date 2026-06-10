@@ -5,6 +5,7 @@ import { useUpdateUser, useDeleteUser } from "../../hooks/useUserQueries";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
+import InputComponent from "../../components/InputComponent/InputComponent.jsx";
 
 const AccountPage = () => {
   const navigate = useNavigate();
@@ -46,6 +47,13 @@ const AccountPage = () => {
     navigate("/login");
   };
 
+  const passwordValidation = {
+    hasNumber: value => /\d/.test(value) || "Must contain a number",
+    hasUpper: value => /[A-Z]/.test(value) || "Must contain an uppercase letter",
+    hasLower: value => /[a-z]/.test(value) || "Must contain a lowercase letter",
+    hasSpecial: value => /[!@#$%^&*(),.?":{}|<>]/.test(value) || "Must contain a special character",
+  }
+
   const password = watch("password", "");
 
   if (isSaving || isDeleteing) return <LoadingSpinner />
@@ -56,22 +64,22 @@ const AccountPage = () => {
       <h1>Account</h1>
       <p>Welcome to your account page.</p>
       <form className={styles.userInfo} onSubmit={handleSubmit(onUpdate)}>
-        <input type="text" {...register('userName', { required: 'Ovo polje je obavezno'})}/>
-        {errors.userName && <p style={{ color: 'red' }}>{errors.userName.message}</p>}
-        <input type="email"{...register('email', { required: 'Ovo polje je obavezno'})}/>
-        {errors.email && <p style={{ color: 'red' }}>{errors.email.message}</p>}
-        <input type="password" {...register("password", {
-          validate: (value) => {
-              if (!value) return true;
-              if (value.length < 8) return "Minimum 8 characters";
-              if (!/\d/.test(value)) return "Must contain a number";
-              if (!/[A-Z]/.test(value)) return "Must contain an uppercase letter";
-              if (!/[a-z]/.test(value)) return "Must contain a lowercase letter";
-              if (!/[!@#$%^&*(),.?\":{}|<>]/.test(value)) return "Must contain a special character";
-              return true;
-            }
-          })} />
-        {errors.password && <p style={{ color: 'red' }}>{errors.password.message}</p>}
+        <InputComponent iName="userName" iType="text" label="Username"
+          register={register}
+          errors={errors}
+        />
+
+        <InputComponent iName="email" iType="email" label="Email"
+          register={register}
+          errors={errors}
+        />
+          
+        <InputComponent iName="password" label="Password" iType="password"
+          validateShow={true}
+          validateObj={passwordValidation}
+          register={register}
+          errors={errors}
+        />
 
         {isUpdateError && <p style={{ color: 'red' }}>{updateError.message}</p>}
         {isDeleteError && <p style={{ color: 'red' }}>{deleteError.message}</p>}

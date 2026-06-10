@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useForgotPassword } from "../../hooks/useAuthQueries";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
+import InputComponent from "../../components/InputComponent/InputComponent.jsx";
 import styles from "./ForgotPasswordPage.module.scss";
 
 const ForgotPasswordPage = () => {
@@ -20,10 +21,9 @@ const ForgotPasswordPage = () => {
     <div id="forgot-password-container">
       <h2>Forgot Password</h2>
       <form onSubmit={handleSubmit(onForgotPassword)}>
-        <div>
-          <label>Email:</label>
-          <input type="email" name="email" {...register("email")} />
-        </div>
+        <InputComponent iName="email" iType="email" label="Email"
+          register={register}
+        />
         <button>Forgot Password</button>
       </form>
       {isForgotPassError && <p style={{ color: 'red' }}>{forgotPassError.message}</p>}
