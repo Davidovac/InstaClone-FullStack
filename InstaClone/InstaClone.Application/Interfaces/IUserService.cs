@@ -11,6 +11,8 @@ namespace InstaClone.Application.Interfaces
     public interface IUserService
     {
         Task<IReadOnlyList<UserDto>> GetAllAsync();
-        Task<UserDto?> GetByIdAsync(Guid id);
+        Task<UserDto> GetByIdAsync(Guid id);
+        Task<UserDto> UpdateAsync(Guid id, UserUpdateRequestDto userData);
+        Task DeleteAsync(Guid id);
     }
 }

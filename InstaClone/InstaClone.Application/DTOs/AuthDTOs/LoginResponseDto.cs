@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InstaClone.Application.DTOs.UserDTOs;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace InstaClone.Application.DTOs.AuthDTOs
         [Required]
         [MinLength(15)]
         public string Token { get; set; }
+        public UserDto User { get; set; }
     }
 }

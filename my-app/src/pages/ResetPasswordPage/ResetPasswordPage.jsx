@@ -3,15 +3,18 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useSearchParams } from "react-router-dom";
 import { useResetPassword } from "../../hooks/useAuthQueries";
-import "./ResetPasswordPage.module.scss";
+import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
+import InputComponent from "../../components/InputComponent/InputComponent.jsx";
+import styles from "./ResetPasswordPage.module.scss";
 
 const ResetPasswordPage = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const email = searchParams.get("email");
-  const { register, handleSubmit, formState } = useForm();
+  const { register, handleSubmit, watch, formState: {errors} } = useForm();
   const { mutate: resetPassword, isPending: isSaving, isError: isResetPassError, error: resetPassError } = useResetPassword();
   const navigate = useNavigate();
+  const password = watch("password");
 
   const onResetPassword = async (data, e) => {
     e.preventDefault();
@@ -24,19 +27,26 @@ const ResetPasswordPage = () => {
     });
   };
 
-  if (isSaving) return <div id="loadingSpinner" className="spinner"></div>;
+  if (isSaving) return <LoadingSpinner />;
   return(
-    <div id="reset-password-container">
+    <div id={styles.resetPasswordContainer}>
       <h2>Reset Password</h2>
       <form onSubmit={handleSubmit(onResetPassword)}>
-        <div>
-          <label>New Password:</label>
-          <input type="password" name="newPassword" {...register("newPassword")} />
+        <InputComponent iName="password" label="Password" iType="password"
+          validateBool={true}
+          validateType="password"
+          register={register}
+          errors={errors}
+        />
 
-          <label>Confirm Password:</label>
-          <input type="password" name="confirmPassword" {...register("confirmPassword")} />
-        </div>
-        <button>Reset Password</button>
+        <InputComponent iName="confirmPassword" label="Confirm Password" iType="password"
+          validateBool={true}
+          validateType="confirmPassword"
+          password={password}
+          register={register}
+          errors={errors}
+        />
+        <button type="submit">Reset Password</button>
       </form>
       {isResetPassError && <p style={{ color: 'red' }}>{resetPassError.message}</p>}
     </div>

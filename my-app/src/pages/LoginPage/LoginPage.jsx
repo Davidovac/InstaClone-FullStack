@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, Link } from "react-router-dom";
 import { useLogin } from "../../hooks/useAuthQueries";
-import "./LoginPage.module.scss";
+import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner.jsx";
+import InputComponent from "../../components/InputComponent/InputComponent.jsx";
+import styles from "./LoginPage.module.scss";
 
 const LoginPage = () => {
-  const { register, handleSubmit, formState } = useForm();
+  const { register, handleSubmit, formState: {errors} } = useForm();
   const { mutate: login, isPending: isSaving, isError: isLoginError, error: loginError } = useLogin();
   const navigate = useNavigate();
 
@@ -19,19 +21,20 @@ const LoginPage = () => {
     });
   };
 
-  if (isSaving) return <div id="loadingSpinner" className="spinner"></div>;
+  if (isSaving) return <LoadingSpinner />;
   return(
     <div id="login-container">
       <h2>Login</h2>
       <form onSubmit={handleSubmit(onLogin)}>
-        <div>
-          <label>Username:</label>
-          <input type="text" name="userName" {...register("userName")} />
-        </div>
-        <div>
-          <label>Password:</label>
-          <input type="password" name="password" {...register("password")} />
-        </div>
+        <InputComponent iName="userName" label="Username" iType="text"
+          register={register}
+          errors={errors}
+        />
+        
+        <InputComponent iName="password" label="Password" iType="password"
+          register={register}
+          errors={errors}
+        />
         <button>Login</button>
       </form>
       <p className="forgot-password">

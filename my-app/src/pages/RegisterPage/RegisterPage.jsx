@@ -2,15 +2,19 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useRegister } from "../../hooks/useAuthQueries";
-import "./RegisterPage.module.scss";
+import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
+import styles from "./RegisterPage.module.scss";
+import InputComponent from "../../components/InputComponent/InputComponent.jsx"
 
 const RegisterPage = () => {
-  const { register, handleSubmit, formState } = useForm();
+  const { register, handleSubmit, watch, formState: {errors} } = useForm({
+    mode: "onSubmit"
+  });
   const { mutate: registerUser, isPending: isSaving, isError: isRegisterError, error: registerError } = useRegister();
   const navigate = useNavigate();
-  const [isPasswordValidDeterminator, setIsPasswordValidDeterminator] = useState(true);
+  const password = watch("password");
 
-  const onRegister = async (data, e) => {
+  const onRegister = async (data) => {
     const payload = {
       userName: data.userName,
       password: data.password,
@@ -18,11 +22,7 @@ const RegisterPage = () => {
       firstName: data.firstName,
       lastName: data.lastName,
     };
-    e.preventDefault();
-    if (isPasswordInvalid) {
-      setIsPasswordValidDeterminator(false);
-      return;
-    }
+
     registerUser(payload, {
       onSuccess: () => {
         alert("Uspesno ste se registrovali!");
@@ -31,50 +31,48 @@ const RegisterPage = () => {
     });
   };
 
-  
-
-  const isPasswordMismatch = formState.dirtyFields.password && formState.dirtyFields.confirmPassword 
-  && formState.values.password !== formState.values.confirmPassword;
-
-  const isPasswordInvalid = formState.dirtyFields.password && 
-  (formState.values.password.length < 8 || !/\d/.test(formState.values.password) || !/[A-Z]/.test(formState.values.password) 
-  || !/[a-z]/.test(formState.values.password) || !/[!@#$%^&*(),.?":{}|<>]/.test(formState.values.password));
-
-
-  if (isSaving) return <div id="loadingSpinner" className="spinner"></div>;
+  if (isSaving) return <LoadingSpinner />;
   return(
     <div id="login-container">
       <h2>Register</h2>
       <form onSubmit={handleSubmit(onRegister)}>
-        <div>
-          <label>Username:</label>
-          <input type="text" name="userName" {...register("userName")} />
-        </div>
-        <div>
-          <label>email:</label>
-          <input type="email" name="email" {...register("email")} />
-        </div>
-        <div>
-          <label>Password:</label>
-          {!isPasswordValidDeterminator && <p style={{ color: 'red' }}>Password is invalid</p>}
-          <input type="password" name="password" {...register("password", {onChange: () => setIsPasswordValidDeterminator(true),})} />
-        </div>
-        <div>
-          <label>Confirm Password:</label>
-          {isPasswordMismatch && <p style={{ color: 'red' }}>Passwords do not match</p>}
-          <input type="password" name="confirmPassword" {...register("confirmPassword")} />
-        </div>
-        <div>
-          <label>First Name:</label>
-          <input type="text" name="firstName" {...register("firstName")} />
-        </div>
-        <div>
-          <label>Last Name:</label>
-          <input type="text" name="lastName" {...register("lastName")} />
-        </div>
-        <button type="submit" disabled={isPasswordMismatch}>Register</button>
+        <InputComponent iName="userName" label="Username" iType="text"
+          register={register}
+          errors={errors}
+        />
+        
+        <InputComponent iName="email" iType="email" label="Email"
+          register={register}
+          errors={errors}
+        />
+
+        <InputComponent iName="password" label="Password" iType="password"
+          validateBool={true}
+          validateType="password"
+          register={register}
+          errors={errors}
+        />
+
+        <InputComponent iName="confirmPassword" label="Confirm Password" iType="password"
+          validateBool={true}
+          validateType="confirmPassword"
+          password={password}
+          register={register}
+          errors={errors}
+        />
+
+        <InputComponent iName="firstName" label="First Name" iType="text"
+          register={register}
+          errors={errors}
+        />
+
+        <InputComponent iName="lastName" label="Last Name" iType="text"
+          register={register}
+          errors={errors}
+        />
+        {isRegisterError && <p style={{ color: 'red' }}>{registerError.message}</p>}
+        <button type="submit">Register</button>
       </form>
-      {isRegisterError && <p style={{ color: 'red' }}>{registerError.message}</p>}
     </div>
   );
 };

@@ -15,10 +15,14 @@ namespace InstaClone.Application.Mappings
         public UserMappings()
         {
             CreateMap<RegisterRequestDto, User>()
-                .ForMember(
-                dest => dest.PasswordHash,
-                opt => opt.Ignore()
-                );
+                .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
+
+            CreateMap<UserUpdateRequestDto, User>()
+                .ForMember(dest => dest.PasswordHash, opt =>
+                {
+                    opt.Condition(src => src.Password == string.Empty);
+                    opt.Ignore();
+                });
 
             CreateMap<UserDto, User>().ReverseMap();
         }

@@ -1,4 +1,5 @@
-﻿using InstaClone.Application.Interfaces;
+﻿using InstaClone.Application.DTOs.UserDTOs;
+using InstaClone.Application.Interfaces;
 using InstaClone.Application.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,20 @@ namespace InstaClone.Api.Controllers
             var user = await _userService.GetByIdAsync(id);
 
             return Ok(user);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UserUpdateRequestDto userData)
+        {
+            var user = await _userService.UpdateAsync(id, userData);
+            return Ok(user);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsync(Guid id)
+        {
+            await _userService.DeleteAsync(id);
+            return NoContent();
         }
     }
 }

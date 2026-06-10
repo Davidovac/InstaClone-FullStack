@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/useAuthStore';
 
-let api = axios.create({
+const api = axios.create({
   baseURL: 'http://localhost:5231/api',
   headers: {
     'Content-Type': 'application/json',

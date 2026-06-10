@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using InstaClone.Application.DTOs.AuthDTOs;
+using InstaClone.Application.DTOs.UserDTOs;
 using InstaClone.Application.Exceptions;
 using InstaClone.Application.Interfaces;
 using InstaClone.Application.Settings;
@@ -58,7 +59,8 @@ namespace InstaClone.Application.Services
 
             var loginResponse = new LoginResponseDto
             {
-                Token = token
+                Token = token,
+                User = _mapper.Map<UserDto>(user)   
             };
 
             return loginResponse;
@@ -66,21 +68,9 @@ namespace InstaClone.Application.Services
 
         public async Task RegisterAsync(RegisterRequestDto registerRequest)
         {
-            bool isPasswordValid = registerRequest.ValidatePassword();
-            if (!isPasswordValid)
-                throw new BadRequestException("Password does not meet the required criteria.");
-
             User user = _mapper.Map<User>(registerRequest);
 
             user.EmailConfirmed = false;
-
-            bool emailExists = await _userManager.FindByEmailAsync(registerRequest.Email) != null;
-            if (emailExists)
-                throw new BadRequestException("An account with this email already exists.");
-
-            bool usernameExists = await _userManager.FindByNameAsync(registerRequest.UserName) != null;
-            if (usernameExists)
-                throw new BadRequestException("A user with this username already exists.");
 
             var createResult = await _userManager.CreateAsync(user, registerRequest.Password);
             if (!createResult.Succeeded)
@@ -189,7 +179,7 @@ namespace InstaClone.Application.Services
             }
             catch (Exception ex)
             {
-                return;
+                throw new Exception("Error while trying to send a password reset email or with frontend url setting.");
             }
         }
 
