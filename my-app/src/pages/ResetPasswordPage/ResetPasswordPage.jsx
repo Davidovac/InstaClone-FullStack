@@ -11,9 +11,10 @@ const ResetPasswordPage = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const email = searchParams.get("email");
-  const { register, handleSubmit, formState: {errors} } = useForm();
+  const { register, handleSubmit, watch, formState: {errors} } = useForm();
   const { mutate: resetPassword, isPending: isSaving, isError: isResetPassError, error: resetPassError } = useResetPassword();
   const navigate = useNavigate();
+  const password = watch("password");
 
   const onResetPassword = async (data, e) => {
     e.preventDefault();
@@ -32,15 +33,16 @@ const ResetPasswordPage = () => {
       <h2>Reset Password</h2>
       <form onSubmit={handleSubmit(onResetPassword)}>
         <InputComponent iName="password" label="Password" iType="password"
-          validateShow={true}
-          validateObj={passwordValidation}
+          validateBool={true}
+          validateType="password"
           register={register}
           errors={errors}
         />
 
         <InputComponent iName="confirmPassword" label="Confirm Password" iType="password"
-          validateShow={true}
-          validateObj={confirmPassValidate}
+          validateBool={true}
+          validateType="confirmPassword"
+          password={password}
           register={register}
           errors={errors}
         />

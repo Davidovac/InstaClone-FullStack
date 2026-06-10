@@ -14,8 +14,8 @@ const AccountPage = () => {
   const { mutate: deleteUser, isPedning: isDeleteing, isError: isDeleteError, error: deleteError} = useDeleteUser();
   const { register, handleSubmit, watch, formState: { errors} } = useForm({
     defaultValues: {
-      userName: user?.userName || "",
-      email: user?.email || "",
+      userName: user?.userName ?? "",
+      email: user?.email ?? "",
     }
   });
 
@@ -47,13 +47,6 @@ const AccountPage = () => {
     navigate("/login");
   };
 
-  const passwordValidation = {
-    hasNumber: value => /\d/.test(value) || "Must contain a number",
-    hasUpper: value => /[A-Z]/.test(value) || "Must contain an uppercase letter",
-    hasLower: value => /[a-z]/.test(value) || "Must contain a lowercase letter",
-    hasSpecial: value => /[!@#$%^&*(),.?":{}|<>]/.test(value) || "Must contain a special character",
-  }
-
   const password = watch("password", "");
 
   if (isSaving || isDeleteing) return <LoadingSpinner />
@@ -75,8 +68,8 @@ const AccountPage = () => {
         />
           
         <InputComponent iName="password" label="Password" iType="password"
-          validateShow={true}
-          validateObj={passwordValidation}
+          validateBool={true}
+          validateType="password"
           register={register}
           errors={errors}
         />

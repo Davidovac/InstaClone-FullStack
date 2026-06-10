@@ -7,7 +7,7 @@ import styles from "./RegisterPage.module.scss";
 import InputComponent from "../../components/InputComponent/InputComponent.jsx"
 
 const RegisterPage = () => {
-  const { register, handleSubmit, watch, formState: {errors, dirtyFields} } = useForm({
+  const { register, handleSubmit, watch, formState: {errors} } = useForm({
     mode: "onSubmit"
   });
   const { mutate: registerUser, isPending: isSaving, isError: isRegisterError, error: registerError } = useRegister();
@@ -31,18 +31,6 @@ const RegisterPage = () => {
     });
   };
 
-  const confirmPassValidate = {
-    matchesPassword: value => value === password || "Passwords do not match",
-  }
-
-  const passwordValidation = {
-    hasNumber: value => /\d/.test(value) || "Must contain a number",
-    hasUpper: value => /[A-Z]/.test(value) || "Must contain an uppercase letter",
-    hasLower: value => /[a-z]/.test(value) || "Must contain a lowercase letter",
-    hasSpecial: value => /[!@#$%^&*(),.?":{}|<>]/.test(value) || "Must contain a special character",
-  }
-
-
   if (isSaving) return <LoadingSpinner />;
   return(
     <div id="login-container">
@@ -52,35 +40,23 @@ const RegisterPage = () => {
           register={register}
           errors={errors}
         />
+        
         <InputComponent iName="email" iType="email" label="Email"
           register={register}
           errors={errors}
         />
-        {/*<div>
-          <label>Password:</label>
-          <input type="password" {...register("password", {
-            required: "Password is required",
-            minLength: { value: 8, message: "Minimum 8 characters"},
-            validate: {
-              hasNumber: value => /\d/.test(value) || "Must contain a number",
-              hasUpper: value => /[A-Z]/.test(value) || "Must contain an uppercase letter",
-              hasLower: value => /[a-z]/.test(value) || "Must contain a lowercase letter",
-              hasSpecial: value => /[!@#$%^&*(),.?":{}|<>]/.test(value) || "Must contain a special character",
-            },
-          })} />
-          {errors.password && <p style={{ color: 'red' }}>{errors.password.message}</p>}
 
-        </div>*/}
         <InputComponent iName="password" label="Password" iType="password"
-          validateShow={true}
-          validateObj={passwordValidation}
+          validateBool={true}
+          validateType="password"
           register={register}
           errors={errors}
         />
 
         <InputComponent iName="confirmPassword" label="Confirm Password" iType="password"
-          validateShow={true}
-          validateObj={confirmPassValidate}
+          validateBool={true}
+          validateType="confirmPassword"
+          password={password}
           register={register}
           errors={errors}
         />
