@@ -22,11 +22,8 @@ using Serilog.Settings.Configuration;
 using System.IO;
 using System.Text;
 
-
-
 try
 {
-
     var builder = WebApplication.CreateBuilder(args);
 
     Log.Logger = new LoggerConfiguration()
@@ -121,6 +118,7 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
+    app.UseStaticFiles();
 
     app.Run();
 

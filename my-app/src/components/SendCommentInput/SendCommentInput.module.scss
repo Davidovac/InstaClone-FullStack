@@ -1,0 +1,29 @@
+.sendCommentInput {
+  margin: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+
+  input {
+    flex-grow: 1;
+    padding: 0 1rem;
+    height: 1.8rem;
+    border-radius: 8px;
+    outline: none;
+    border: none;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  button {
+    margin: 0;
+    width: 20%;
+    height: 1.8rem;
+    border-radius: 8px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border: 0;
+    background-color: rgb(40, 155, 116);
+    color: white;
+  }
+}

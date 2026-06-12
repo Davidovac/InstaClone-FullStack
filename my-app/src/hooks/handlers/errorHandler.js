@@ -1,5 +1,14 @@
 export function errorHandler(error) {
-  const backendMessage = error.response?.status && error.response?.status != 500 ? error.response?.data?.detail : "Server error";
-  console.error(backendMessage);
-  return backendMessage;
+  const response = error?.response;
+  const data = response?.data;
+
+  const message =
+    data?.detail ||
+    data?.message ||
+    (Array.isArray(data?.errors) && data.errors.join('; ')) ||
+    error?.message ||
+    "Server error";
+
+  console.error(message);
+  return message;
 }

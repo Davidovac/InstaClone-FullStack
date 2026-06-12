@@ -32,4 +32,8 @@
     <ProjectReference Include="..\InstaClone.Infrastructure\InstaClone.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\defaults\" />
+  </ItemGroup>
+
 </Project>

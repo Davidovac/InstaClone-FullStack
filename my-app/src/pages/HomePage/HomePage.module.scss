@@ -1,0 +1,26 @@
+.homePage {
+  display: flex;
+  min-height: 100vh;
+  .content {
+    padding: 1vh;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgb(49, 31, 53);
+
+    .feedWrapper {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+    }
+  }
+
+  .suggestions {
+    padding: 1vh;
+    width: 18%;
+    background-color: rgb(87, 75, 97);
+  }
+}

@@ -35,6 +35,7 @@ a {
 .container {
   height: 100%;
   display: flex;
+  position: fixed;
   nav {
     display: flex;
     flex-direction: column;

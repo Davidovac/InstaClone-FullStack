@@ -22,6 +22,139 @@ namespace InstaClone.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("InstaClone.Domain.Entities.Comment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("author_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("post_id");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("text");
+
+                    b.HasKey("Id")
+                        .HasName("pk_comments");
+
+                    b.HasIndex("AuthorId")
+                        .HasDatabaseName("ix_comments_author_id");
+
+                    b.HasIndex("PostId")
+                        .HasDatabaseName("ix_comments_post_id");
+
+                    b.ToTable("comments");
+                });
+
+            modelBuilder.Entity("InstaClone.Domain.Entities.Like", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("LikerId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("liker_id");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("post_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_likes");
+
+                    b.HasIndex("LikerId")
+                        .HasDatabaseName("ix_likes_liker_id");
+
+                    b.HasIndex("PostId")
+                        .HasDatabaseName("ix_likes_post_id");
+
+                    b.ToTable("likes");
+                });
+
+            modelBuilder.Entity("InstaClone.Domain.Entities.Post", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("author_id");
+
+                    b.Property<string>("Caption")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("caption");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Photo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("photo");
+
+                    b.HasKey("Id")
+                        .HasName("pk_posts");
+
+                    b.HasIndex("AuthorId")
+                        .HasDatabaseName("ix_posts_author_id");
+
+                    b.ToTable("posts");
+                });
+
+            modelBuilder.Entity("InstaClone.Domain.Entities.ReplyComment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("author_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("RepliedCommentId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("replied_comment_id");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("text");
+
+                    b.HasKey("Id")
+                        .HasName("pk_reply_comments");
+
+                    b.HasIndex("AuthorId")
+                        .HasDatabaseName("ix_reply_comments_author_id");
+
+                    b.HasIndex("RepliedCommentId")
+                        .HasDatabaseName("ix_reply_comments_replied_comment_id");
+
+                    b.ToTable("reply_comments");
+                });
+
             modelBuilder.Entity("InstaClone.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -37,10 +170,6 @@ namespace InstaClone.Infrastructure.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("concurrency_stamp");
-
-                    b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("date_of_birth");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -90,6 +219,16 @@ namespace InstaClone.Infrastructure.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit")
                         .HasColumnName("phone_number_confirmed");
+
+                    b.Property<string>("ProfileDesc")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("profile_desc");
+
+                    b.Property<string>("ProfilePicture")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("profile_picture");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)")
@@ -281,6 +420,89 @@ namespace InstaClone.Infrastructure.Migrations
                     b.ToTable("asp_net_user_tokens", (string)null);
                 });
 
+            modelBuilder.Entity("user_followers", b =>
+                {
+                    b.Property<Guid>("follower_id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("following_id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("follower_id", "following_id");
+
+                    b.HasIndex("following_id");
+
+                    b.ToTable("user_followers");
+                });
+
+            modelBuilder.Entity("InstaClone.Domain.Entities.Comment", b =>
+                {
+                    b.HasOne("InstaClone.Domain.Entities.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InstaClone.Domain.Entities.Post", "Post")
+                        .WithMany("Comments")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("InstaClone.Domain.Entities.Like", b =>
+                {
+                    b.HasOne("InstaClone.Domain.Entities.User", "Liker")
+                        .WithMany()
+                        .HasForeignKey("LikerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InstaClone.Domain.Entities.Post", "Post")
+                        .WithMany("Likes")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Liker");
+
+                    b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("InstaClone.Domain.Entities.Post", b =>
+                {
+                    b.HasOne("InstaClone.Domain.Entities.User", "Author")
+                        .WithMany("Posts")
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+                });
+
+            modelBuilder.Entity("InstaClone.Domain.Entities.ReplyComment", b =>
+                {
+                    b.HasOne("InstaClone.Domain.Entities.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("InstaClone.Domain.Entities.Comment", "RepliedComment")
+                        .WithMany("ReplyComments")
+                        .HasForeignKey("RepliedCommentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("RepliedComment");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
@@ -330,6 +552,38 @@ namespace InstaClone.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("user_followers", b =>
+                {
+                    b.HasOne("InstaClone.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("follower_id")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("InstaClone.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("following_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("InstaClone.Domain.Entities.Comment", b =>
+                {
+                    b.Navigation("ReplyComments");
+                });
+
+            modelBuilder.Entity("InstaClone.Domain.Entities.Post", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Likes");
+                });
+
+            modelBuilder.Entity("InstaClone.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }
