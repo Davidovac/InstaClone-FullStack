@@ -143,7 +143,7 @@ export function useCreateReplyComment() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (postId, commentId, data) => {
+    mutationFn: async ({postId, commentId, data}) => {
       try {
         return await postService.createReplyComment(postId, commentId, data)
       } catch (error) {

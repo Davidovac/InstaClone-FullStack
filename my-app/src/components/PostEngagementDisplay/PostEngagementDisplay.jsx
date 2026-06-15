@@ -15,11 +15,14 @@ const PostEngagementDisplay = ({ commentsShow, setCommentsShow, likesCount = 0, 
         {authorUsername && authorUsername != "" && <p><b>{authorUsername}</b> {caption}</p>}
       </div>
 
-      {commentsCount > 0 && !commentsShow && <div className={styles.showCommentsContainer}>
+      {commentsCount > 0 && !commentsShow ? <div className={styles.showCommentsContainer}>
         <button type="button" onClick={(e) => setCommentsShow(true)} className={styles.showCommentsBtn}>
           <b>Show {commentsCount} comments</b>
         </button>
-      </div>}
+      </div>
+      : <div className={styles.showCommentsContainer}>
+        <button type="button" onClick={() => setCommentsShow(false)}>Hide comments</button>
+        </div>}
     </div>
   );
 };

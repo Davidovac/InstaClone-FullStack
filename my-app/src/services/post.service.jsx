@@ -48,6 +48,6 @@ export const postService = {
   },
 
   createReplyComment: async (postId, commentId, data) => {
-    const res = await api.post(`/posts/${postId}/comment/${commentId}/reply`, data);
+    const res = await api.post(`/posts/${postId}/comment/${commentId}/reply`, {Text: data});
   },
 };

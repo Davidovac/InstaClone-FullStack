@@ -3,12 +3,16 @@ import styles from "./PostCard.module.scss";
 import CommentsSection from "../CommentsSection/CommentsSection";
 import PostEngagementDisplay from "../PostEngagementDisplay/PostEngagementDisplay.jsx";
 import SendCommentInput from "../SendCommentInput/SendCommentInput";
-import { useCreateComment, useLikePost, useUnlikePost } from "../../hooks/usePostQueries.js";
+import { useCreateComment, useCreateReplyComment, useLikePost, useUnlikePost } from "../../hooks/usePostQueries.js";
 
 const PostCard = ({ post }) => {
   const [commentsShow, setCommentsShow] = useState(false);
-  const [typedComment, setTypedSomment] = useState("");
+  const [typedComment, setTypedComment] = useState("");
+  const [isReply, setIsReply] = useState(false);
+  const [repliedCommentId, setRepliedCommentId] = useState(null);
+  const [repliedCommentAuthorName ,setRepliedCommentAuthorName] = useState(null);
   const { mutate: createComment, isPending: isSavingComment, isError: isCreateCommentError, error: createCommentError } = useCreateComment();
+  const { mutate: createReply, isPending: isSavingReply, isError: isCreateReplyError, error: createReplyError } = useCreateReplyComment();
   const { mutate: like, isPending: isSavingLike, isError: isLikeError, error: likeError } = useLikePost();
   const { mutate: unlike, isPending: isDeletingLike, isError: isUnlikeError, error: enlikeError } = useUnlikePost();
   const [action, setAction] = useState(null); // "like" | "unlike" | null
@@ -26,6 +30,11 @@ const PostCard = ({ post }) => {
       setIsActuallyLiked(false)
     }
   },[post])
+
+  useEffect(() => {
+    setRepliedCommentAuthorName(null);
+    setIsReply(false);
+  }, [commentsShow]);
 
   useEffect(() => {
     if (!action) {
@@ -74,13 +83,39 @@ const PostCard = ({ post }) => {
     }
   };
   
-  const handleSend = async () => {
-    await createComment({ postId: post.id, data: typedComment }), {
+  const handleSendComment = async () => {
+    if (!isReply) {
+      await createComment({ postId: post.id, data: typedComment }), {
+        onSuccess: (data) => {
+          setTypedComment("");
+          post.comments.push(data);
+        }
+      };
+    }
+    else {
+      handleSendReply()
+    }
+  }
+
+  const handleSendReply = async () => {
+    await createReply({postId: post.id, commentId: repliedCommentId, data: typedComment }) , {
       onSuccess: (data) => {
-        setTypedSomment("");
-        post.comments.push(data);
+        setTypedReply("");
+        post.comments.find(c => c.id == commentId).replies.push(data);
+
+      },
+      onSettled: () => {
+        setIsReply(false);
+        setRepliedCommentAuthorName(null);
       }
-    };
+    }
+    
+  }
+
+  const handleReplyAction = (parentId, authorName) => {
+    setIsReply(true);
+    setRepliedCommentId(parentId);
+    setRepliedCommentAuthorName(!authorName ? null : authorName);
   }
 
   return(
@@ -107,8 +142,10 @@ const PostCard = ({ post }) => {
       onLikeUnlike={handleLikeUnlike}/>
 
       <div className={styles.commentsSectionContainer}>
-        {commentsShow && <CommentsSection comments={post?.comments}/>}
-        <SendCommentInput comment={typedComment} setComment={setTypedSomment} onSend={handleSend}/>
+        {commentsShow && <CommentsSection comments={post?.comments} replyAction={handleReplyAction}/>}
+        <SendCommentInput comment={typedComment} setComment={setTypedComment} 
+        onSend={handleSendComment} repliedCommentAuthorName={repliedCommentAuthorName}
+        isReply={isReply}/>
       </div>
     </div>
   );

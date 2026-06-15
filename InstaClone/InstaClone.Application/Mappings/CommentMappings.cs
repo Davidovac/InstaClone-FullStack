@@ -22,11 +22,12 @@ namespace InstaClone.Application.Mappings
 
             CreateMap<Comment, CommentResponseDto>()
                 .ForMember(dest => dest.AuthorName, opt => opt.MapFrom(src => src.Author.UserName))
-                .ForMember(dest => dest.AuthorPictureUrl, opt => opt.MapFrom(src => src.Author.ProfilePicture));
+                .ForMember(dest => dest.AuthorPictureUrl, opt => opt.MapFrom(src => src.Author.ProfilePicture))
+                .ForMember(dest => dest.Replies, opt => opt.MapFrom(src => src.ReplyComments));
 
             //REPLIES (on post comments)
 
-            CreateMap<ReplyCreateRequestDto, Comment>()
+            CreateMap<ReplyCreateRequestDto, ReplyComment>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
 
             CreateMap<ReplyComment, ReplyResponseDto>()
