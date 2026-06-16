@@ -14,11 +14,13 @@ namespace InstaClone.Api.Controllers
     {
         private readonly IPostService _postService;
         private readonly ICommentService _commentService;
+        private readonly ILikeService _likeService;
 
-        public PostsController(IPostService postService, ICommentService commentService)
+        public PostsController(IPostService postService, ICommentService commentService, ILikeService likeService)
         {
             _postService = postService;
             _commentService = commentService;
+            _likeService = likeService;
         }
 
         [HttpGet("feed")]
@@ -73,28 +75,28 @@ namespace InstaClone.Api.Controllers
         [HttpPost("{postId}/like")]
         public async Task<IActionResult> LikePostAsync(Guid postId)
         {
-            await _postService.LikePostAsync(postId, User);
+            await _likeService.LikePostAsync(postId, User);
             return Ok();
         }
 
         [HttpDelete("{postId}/like")]
         public async Task<IActionResult> UnlikePostAsync(Guid postId)
         {
-            await _postService.UnlikePostAsync(postId, User);
+            await _likeService.UnlikePostAsync(postId, User);
             return NoContent();
         }
 
         [HttpPost("{postId}/comment")]
         public async Task<IActionResult> CommentOnPostAsync(Guid postId, [FromBody] CommentCreateRequestDto comment)
         {
-            var newComment = await _postService.CommentOnPostAsync(postId, comment, User);
+            var newComment = await _commentService.CommentOnPostAsync(postId, comment, User);
             return Ok(newComment);
         }
 
         [HttpPost("{postId}/comment/{commentId}/reply")]
         public async Task<IActionResult> ReplyOnCommentOnThisPostAsync(Guid postId, Guid commentId, [FromBody] ReplyCreateRequestDto reply)
         {
-            var newReply = await _postService.ReplyOnCommentOnThisPostAsync(postId, commentId, reply, User);
+            var newReply = await _commentService.ReplyOnCommentOnThisPostAsync(postId, commentId, reply, User);
             return Ok(newReply);
         }
     }

@@ -1,13 +1,12 @@
 import React from "react";
 import styles from "./Comment.module.scss";
+import Avatar from "../AvatarComponent/Avatar";
 
 const Comment = ({ commentData, replyAction, parentId = null }) => {
   return (
     <div className={styles.comment}>
       <div className={styles.commentContent}>
-        <img className="profilePic" src={commentData?.authorPictureUrl && commentData?.authorPictureUrl.length > 10 
-            ? `http://localhost:5231${commentData?.authorPictureUrl}` 
-            : 'http://localhost:5231/images/defaults/defAvatar.jpg'} />
+        <Avatar avatar={commentData?.authorPictureUrl} />
         <p><b>{commentData.authorName}</b> {commentData.text}</p>
       </div>
       <div className={styles.commentFooter}>

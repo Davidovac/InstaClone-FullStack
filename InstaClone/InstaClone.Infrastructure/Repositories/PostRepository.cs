@@ -18,12 +18,9 @@ namespace InstaClone.Infrastructure.Repositories
 
         public async Task<IReadOnlyList<Post>> GetUserFeedAsync(Guid userId)
         {
-            return await _dbContext.Users
-                .Where(u => u.Id == userId)
-                .SelectMany(u => u.Following)
-                .SelectMany(f => f.Posts)
-                .Include(p => p.Comments)
-                .ThenInclude(c => c.ReplyComments)
+            return await _dbContext.Posts
+                .Include(p => p.Author)
+                .Where(p => p.Author.Followers.Any(f => f.Id == userId))
                 .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();
         }
@@ -41,11 +38,11 @@ namespace InstaClone.Infrastructure.Repositories
 
         public async Task<IReadOnlyList<Guid>> FilterLikedByUser(Guid userId, IReadOnlyList<Post> posts)
         {
-            return await _dbContext.Posts
-                .Where(p => 
-                posts.Select(po => po.Id).Contains(p.Id) 
-                && p.Likes.Select(l => l.LikerId).Contains(userId))
-                .Select(p => p.Id)
+            var postIds = posts.Select(p => p.Id);
+
+            return await _dbContext.Likes
+                .Where(l => l.LikerId == userId && postIds.Any(id => id == l.PostId))
+                .Select(l => l.PostId)
                 .ToListAsync();
         }
     }

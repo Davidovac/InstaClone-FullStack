@@ -3,6 +3,7 @@ import styles from "./PostCard.module.scss";
 import CommentsSection from "../CommentsSection/CommentsSection";
 import PostEngagementDisplay from "../PostEngagementDisplay/PostEngagementDisplay.jsx";
 import SendCommentInput from "../SendCommentInput/SendCommentInput";
+import Avatar from "../AvatarComponent/Avatar.jsx";
 import { useCreateComment, useCreateReplyComment, useLikePost, useUnlikePost } from "../../hooks/usePostQueries.js";
 
 const PostCard = ({ post }) => {
@@ -22,13 +23,7 @@ const PostCard = ({ post }) => {
 
   useEffect(() => {
     if (!post) return;
-
-    if (post?.isLiked) {
-      setIsActuallyLiked(true)
-    }
-    else if (!post?.isLiked) {
-      setIsActuallyLiked(false)
-    }
+    setIsActuallyLiked(!!post?.isLiked)
   },[post])
 
   useEffect(() => {
@@ -121,10 +116,8 @@ const PostCard = ({ post }) => {
   return(
     <div className={styles.postCard}>
       <div className={styles.header}>
-        <img className="profilePic" src={post?.authorPictureUrl && post?.authorPictureUrl.length > 10 
-          ? `http://localhost:5231${post?.authorPictureUrl}` 
-          : 'http://localhost:5231/images/defaults/defAvatar.jpg'} />
-        <p><b>{post.authorName}</b></p>
+        <Avatar avatar={post?.authorPictureUrl} />
+        <p><b>{post?.authorName}</b></p>
       </div>
 
       <div className={styles.imageWrapper}>

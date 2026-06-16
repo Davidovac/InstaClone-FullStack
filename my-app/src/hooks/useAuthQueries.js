@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authService } from '../services/auth.service';
 import { useAuthStore } from '../store/useAuthStore';
-import { errorHandler } from './handlers/errorHandler';
 
 export function useLogin() {
   const queryClient = useQueryClient();
@@ -19,8 +18,8 @@ export function useLogin() {
       if (response.data.token) {
         setAuth(response.data.token, response.data.user);
       }
-    },
-  });
+    }
+  })
 }
 
 export function useRegister() {
@@ -36,12 +35,9 @@ export function useRegister() {
     },
     onSuccess: (response) => {
       alert("Uspesno ste se registrovali! Proverite email za aktivaciju naloga.");
-    }});
-    /*onError: (error) => {
-      return Promise.reject(errorHandler(error));
-    }
-  });*/
-}
+    },
+  })
+};
 
 export function useActivateAccount() {
   const queryClient = useQueryClient();
@@ -56,9 +52,9 @@ export function useActivateAccount() {
     },
     onSuccess: (response) => {
       alert("Nalog je aktiviran! Sada se možete prijaviti.");
-    }
-  });
-}
+    },
+  })
+};
 
 export function useForgotPassword() {
   const queryClient = useQueryClient();
@@ -73,9 +69,9 @@ export function useForgotPassword() {
     },
     onSuccess: () => {
       alert("Proverite email za link za resetovanje lozinke.");
-    }
-  });
-}
+    },
+  })
+};
 
 export function useResetPassword() {
   const queryClient = useQueryClient();
@@ -90,6 +86,6 @@ export function useResetPassword() {
     },
     onSuccess: () => {
       alert("Lozinka je uspešno resetovana.");
-    }
-  });
-}
+    },
+  })
+};

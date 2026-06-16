@@ -20,9 +20,5 @@ namespace InstaClone.Application.Interfaces
         Task CreateAsync(PostCreateRequestDto postDto, IFormFile? file, ClaimsPrincipal claimsPrincipal);
         Task UpdateAsync(PostUpdateRequestDto postDto, ClaimsPrincipal claimsPrincipal);
         Task DeleteAsync(Guid id, ClaimsPrincipal claimsPrincipal);
-        Task LikePostAsync(Guid postId, ClaimsPrincipal claimsPrincipal);
-        Task UnlikePostAsync(Guid postId, ClaimsPrincipal claimsPrincipal);
-        Task<CommentResponseDto> CommentOnPostAsync(Guid postId, CommentCreateRequestDto comment, ClaimsPrincipal claimsPrincipal);
-        Task<ReplyResponseDto> ReplyOnCommentOnThisPostAsync(Guid postId, Guid commentId, ReplyCreateRequestDto reply, ClaimsPrincipal claimsPrincipal);
     }
 }

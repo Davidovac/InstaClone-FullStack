@@ -21,23 +21,20 @@ namespace InstaClone.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly UserManager<User> _userManager;
+        private readonly IUserService _userService;
         private readonly ILocalImageStorageService _localImageStorageService;
 
-        public PostService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager, ILocalImageStorageService localImageStorageService)
+        public PostService(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService, ILocalImageStorageService localImageStorageService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _userManager = userManager;
+            _userService = userService;
             _localImageStorageService = localImageStorageService;
         }
 
         public async Task<IReadOnlyList<PostSummaryResponseDto>> GetUserFeedAsync(ClaimsPrincipal claimsPrincipal)
         {
-            var user = await _userManager.GetUserAsync(claimsPrincipal);
-            if (user == null)
-                throw new UnauthorizedAccessException();
-
+            var user = await _userService.GetByClaims(claimsPrincipal);
             var feedRaw = await _unitOfWork.Posts.GetUserFeedAsync(user.Id);
 
             var likedOnlyIds = await _unitOfWork.Posts.FilterLikedByUser(user.Id, feedRaw);
@@ -62,10 +59,7 @@ namespace InstaClone.Application.Services
 
         public async Task<IReadOnlyList<PostSummaryResponseDto>> GetByUserAsync(ClaimsPrincipal claimsPrincipal)
         {
-            var user = await _userManager.GetUserAsync(claimsPrincipal);
-            if (user == null)
-                throw new UnauthorizedAccessException();
-
+            var user = await _userService.GetByClaims(claimsPrincipal);
             var postsRaw = await _unitOfWork.Posts.GetPostsByUserAsync(user.Id);
 
             var likedOnlyIds = await _unitOfWork.Posts.FilterLikedByUser(user.Id, postsRaw);
@@ -93,18 +87,24 @@ namespace InstaClone.Application.Services
             return _mapper.Map<PostDetailResponseDto>(post);
         }
 
+        private async Task<Post> GetOneRawAsync(Guid id)
+        {
+            var post = await _unitOfWork.Posts.GetOneAsync(id);
+            if (post == null)
+            {
+                throw new NotFoundException(id.ToString());
+            }
+            return post;
+        }
+
         public async Task CreateAsync(PostCreateRequestDto postDto, IFormFile? file, ClaimsPrincipal claimsPrincipal)
         {
-            
-            var user = await _userManager.GetUserAsync(claimsPrincipal);
-            if (user == null)
-                throw new UnauthorizedAccessException();
-            
+            var user = await _userService.GetByClaims(claimsPrincipal);
+
             var post = _mapper.Map<Post>(postDto);
             post.AuthorId = user.Id;
             await _unitOfWork.Posts.AddAsync(post);
             await _unitOfWork.CompleteAsync();
-
 
             if (file == null)
                 throw new BadRequestException("File is empty!");
@@ -114,17 +114,10 @@ namespace InstaClone.Application.Services
 
         public async Task UpdateAsync(PostUpdateRequestDto postDto, ClaimsPrincipal claimsPrincipal)
         {
-            var user = await _userManager.GetUserAsync(claimsPrincipal);
-            if (user == null)
-                throw new UnauthorizedAccessException();
+            var user = await _userService.GetByClaims(claimsPrincipal);
+            var post = await GetOneRawAsync(postDto.Id);
 
-            var post = await _unitOfWork.Posts.GetOneAsync(postDto.Id);
-            if (post == null)
-            {
-                throw new NotFoundException(postDto.Id.ToString());
-            }
-
-            if (user.Id != post.Id)
+            if (user.Id != post.AuthorId)
                 throw new UnauthorizedAccessException();
 
             _mapper.Map(postDto, post);
@@ -134,113 +127,14 @@ namespace InstaClone.Application.Services
 
         public async Task DeleteAsync(Guid id, ClaimsPrincipal claimsPrincipal)
         {
-            var user = await _userManager.GetUserAsync(claimsPrincipal);
-            if (user == null)
-                throw new UnauthorizedAccessException();
+            var user = await _userService.GetByClaims(claimsPrincipal);
+            var post = await GetOneRawAsync(id);
 
-            var post = await _unitOfWork.Posts.GetOneAsync(id);
-            if (post == null)
-            {
-                throw new NotFoundException(id.ToString());
-            }
-
-            if (user.Id != post.Id)
+            if (user.Id != post.AuthorId)
                 throw new UnauthorizedAccessException();
 
             _unitOfWork.Posts.Delete(post);
             await _unitOfWork.CompleteAsync();
-        }
-
-        public async Task LikePostAsync(Guid postId, ClaimsPrincipal claimsPrincipal)
-        {
-            var user = await _userManager.GetUserAsync(claimsPrincipal);
-            if (user == null)
-                throw new UnauthorizedAccessException();
-
-            var post = await _unitOfWork.Posts.GetOneAsync(postId);
-            if (post == null)
-                throw new NotFoundException(postId.ToString());
-
-            if (user.Id != post.AuthorId)
-                throw new UnauthorizedAccessException();
-
-
-            Like like = new Like
-            {
-                PostId = postId,
-                LikerId = user.Id
-            };
-
-            await _unitOfWork.Likes.AddAsync(like);
-            await _unitOfWork.CompleteAsync();
-        }
-        public async Task UnlikePostAsync(Guid postId, ClaimsPrincipal claimsPrincipal)
-        {
-            var user = await _userManager.GetUserAsync(claimsPrincipal);
-            if (user == null)
-                throw new UnauthorizedAccessException();
-
-            var post = await _unitOfWork.Posts.GetOneAsync(postId);
-            if (post == null)
-                throw new NotFoundException("Post with id:" + postId.ToString());
-
-            if (user.Id != post.AuthorId)
-                throw new UnauthorizedAccessException();
-
-            var like = await _unitOfWork.Likes.GetOneByUserAndPostAsync(postId, user.Id);
-            if (like == null)
-                throw new NotFoundException("Like with id:" + postId.ToString());
-
-            post.Likes.Remove(like);
-            _unitOfWork.Likes.Delete(like);
-            await _unitOfWork.CompleteAsync();
-        }
-        public async Task<CommentResponseDto> CommentOnPostAsync(Guid postId, CommentCreateRequestDto comment, ClaimsPrincipal claimsPrincipal)
-        {
-            var user = await _userManager.GetUserAsync(claimsPrincipal);
-            if (user == null)
-                throw new UnauthorizedAccessException();
-
-            var post = await _unitOfWork.Posts.GetOneAsync(postId);
-            if (post == null)
-                throw new NotFoundException("Post with id:" + postId.ToString());
-
-            if (user.Id != post.AuthorId)
-                throw new UnauthorizedAccessException();
-
-            var newComment = _mapper.Map<Comment>(comment);
-            newComment.PostId = postId;
-            newComment.AuthorId = user.Id;
-
-            await _unitOfWork.Comments.AddAsync(newComment);
-            await _unitOfWork.CompleteAsync();
-
-            return _mapper.Map<CommentResponseDto>(newComment);
-        }
-        public async Task<ReplyResponseDto> ReplyOnCommentOnThisPostAsync(Guid postId, Guid commentId, ReplyCreateRequestDto reply, ClaimsPrincipal claimsPrincipal)
-        {
-            var user = await _userManager.GetUserAsync(claimsPrincipal);
-            if (user == null)
-                throw new UnauthorizedAccessException();
-
-            var post = await _unitOfWork.Posts.GetOneAsync(postId);
-            if (post == null)
-                throw new NotFoundException("Post with id:" + postId.ToString());
-
-            if (user.Id != post.AuthorId)
-                throw new UnauthorizedAccessException();
-
-            var comment = await _unitOfWork.Comments.GetOneAsync(commentId);
-            if (comment == null)
-                throw new NotFoundException("Comment with id:" + commentId.ToString());
-
-            var newReply = _mapper.Map<ReplyComment>(reply);
-            newReply.RepliedCommentId = commentId;
-            newReply.AuthorId = user.Id;
-
-            await _unitOfWork.ReplyComments.AddAsync(newReply);
-            await _unitOfWork.CompleteAsync();
-            return _mapper.Map<ReplyResponseDto>(newReply);
         }
 
         private async Task AddImageAsync(Post post, IFormFile file)

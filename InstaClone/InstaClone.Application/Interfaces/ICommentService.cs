@@ -10,7 +10,9 @@ namespace InstaClone.Application.Interfaces
         Task<IReadOnlyList<CommentResponseDto>> GetPostCommentsAsync(Guid postId);
         Task<IReadOnlyList<CommentResponseDto>> GetAllAsync();
         Task<IReadOnlyList<ReplyResponseDto>> GetCommentRepliesAsync(Guid commentId);
-        Task<CommentResponseDto?> GetOneAsync(Guid id);
+        Task<CommentResponseDto> GetOneAsync(Guid id);
+        Task<CommentResponseDto> CommentOnPostAsync(Guid postId, CommentCreateRequestDto comment, ClaimsPrincipal claimsPrincipal);
+        Task<ReplyResponseDto> ReplyOnCommentOnThisPostAsync(Guid postId, Guid commentId, ReplyCreateRequestDto reply, ClaimsPrincipal claimsPrincipal);
         Task CreateAsync(CommentCreateRequestDto commentDto, ClaimsPrincipal user);
         Task UpdateAsync(Guid id, CommentUpdateRequestDto commentDto, ClaimsPrincipal user);
         Task DeleteAsync(Guid id, ClaimsPrincipal user);

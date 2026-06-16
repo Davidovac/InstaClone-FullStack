@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,6 +12,8 @@ namespace InstaClone.Application.Interfaces
     {
         Task<IReadOnlyList<LikeResponseDto>> GetAllAsync();
         Task<LikeResponseDto?> GetOneAsync(Guid id);
+        Task LikePostAsync(Guid postId, ClaimsPrincipal claimsPrincipal);
+        Task UnlikePostAsync(Guid postId, ClaimsPrincipal claimsPrincipal);
         Task CreateAsync(LikeResponseDto likeDto);
         Task UpdateAsync(LikeResponseDto likeDto);
         Task DeleteAsync(Guid id);

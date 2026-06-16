@@ -18,13 +18,15 @@ namespace InstaClone.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly UserManager<User> _userManager;
+        private readonly IUserService _userService;
+        private readonly IPostService _postService;
 
-        public CommentService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager)
+        public CommentService(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService, IPostService postService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _userManager = userManager;
+            _userService = userService;
+            _postService = postService;
         }
 
         public async Task<IReadOnlyList<CommentResponseDto>> GetPostCommentsAsync(Guid postId)
@@ -42,22 +44,51 @@ namespace InstaClone.Application.Services
             return _mapper.Map<IReadOnlyList<ReplyResponseDto>>(await _unitOfWork.Comments.GetCommentRepliesAsync(commentId));
         }
 
-        public async Task<CommentResponseDto?> GetOneAsync(Guid id)
+        public async Task<CommentResponseDto> GetOneAsync(Guid id)
         {
             var comment = await _unitOfWork.Comments.GetOneAsync(id);
             if (comment == null)
-            {
-                throw new NotFoundException(id.ToString());
-            }
+                throw new NotFoundException("Comment with id:" + id.ToString());
             return _mapper.Map<CommentResponseDto>(comment);
+        }
+
+        public async Task<CommentResponseDto> CommentOnPostAsync(Guid postId, CommentCreateRequestDto comment, ClaimsPrincipal claimsPrincipal)
+        {
+            var user = await _userService.GetByClaims(claimsPrincipal);
+            var post = await _postService.GetOneAsync(postId);
+
+            var newComment = _mapper.Map<Comment>(comment);
+            newComment.PostId = postId;
+            newComment.AuthorId = user.Id;
+
+            await _unitOfWork.Comments.AddAsync(newComment);
+            await _unitOfWork.CompleteAsync();
+
+            return _mapper.Map<CommentResponseDto>(newComment);
+        }
+        public async Task<ReplyResponseDto> ReplyOnCommentOnThisPostAsync(Guid postId, Guid commentId, ReplyCreateRequestDto reply, ClaimsPrincipal claimsPrincipal)
+        {
+            var user = await _userService.GetByClaims(claimsPrincipal);
+
+            var post = await _unitOfWork.Posts.GetOneAsync(postId);
+            if (post == null)
+                throw new NotFoundException("Post with id:" + postId.ToString());
+
+            var comment = await _unitOfWork.Comments.GetOneAsync(commentId);
+
+            var newReply = _mapper.Map<ReplyComment>(reply);
+            newReply.RepliedCommentId = commentId;
+            newReply.AuthorId = user.Id;
+
+            await _unitOfWork.ReplyComments.AddAsync(newReply);
+            await _unitOfWork.CompleteAsync();
+            return _mapper.Map<ReplyResponseDto>(newReply);
         }
 
         public async Task CreateAsync(CommentCreateRequestDto commentDto, ClaimsPrincipal claimsPrincipal)
         {
-            var user = await _userManager.GetUserAsync(claimsPrincipal);
-            if (user == null)
+            var user = await _userService.GetByClaims(claimsPrincipal);
 
-                throw new UnauthorizedAccessException();
             var comment = _mapper.Map<Comment>(commentDto);
             comment.AuthorId = user.Id;
             await _unitOfWork.Comments.AddAsync(comment);
@@ -66,15 +97,12 @@ namespace InstaClone.Application.Services
 
         public async Task UpdateAsync(Guid id, CommentUpdateRequestDto commentDto, ClaimsPrincipal claimsPrincipal)
         {
-            var user = await _userManager.GetUserAsync(claimsPrincipal);
-            if (user == null)
-
-                throw new UnauthorizedAccessException();
+            var user = await _userService.GetByClaims(claimsPrincipal);
             var comment = await _unitOfWork.Comments.GetOneAsync(id);
-            if (comment == null)
-            {
-                throw new NotFoundException(id.ToString());
-            }
+
+            if (comment.AuthorId != user.Id)
+                throw new UnauthorizedAccessException();
+
             _mapper.Map(commentDto, comment);
             _unitOfWork.Comments.Update(comment);
             await _unitOfWork.CompleteAsync();
@@ -82,15 +110,12 @@ namespace InstaClone.Application.Services
 
         public async Task DeleteAsync(Guid id, ClaimsPrincipal claimsPrincipal)
         {
-            var user = await _userManager.GetUserAsync(claimsPrincipal);
-            if (user == null)
+            var userDto = await _userService.GetByClaims(claimsPrincipal);
+            var comment = await _unitOfWork.Comments.GetOneAsync(id);
+
+            if (comment.AuthorId != userDto.Id)
                 throw new UnauthorizedAccessException();
 
-            var comment = await _unitOfWork.Comments.GetOneAsync(id);
-            if (comment == null)
-            {
-                throw new NotFoundException(id.ToString());
-            }
             _unitOfWork.Comments.Delete(comment);
             await _unitOfWork.CompleteAsync();
         }
