@@ -1,0 +1,44 @@
+.profilePage {
+  width: 100%;
+  background-color: rgb(208, 198, 211);
+  display: flex;
+  justify-content: center;
+  .contentWrapper {
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    padding: 0 10rem;
+    .profileInfo {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      min-height: 25vh;
+
+      .details {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        .userName {
+          font-size: 3rem;
+        }
+
+        .description {
+          
+        }
+
+        button {
+        }
+      }
+    }
+  }
+  
+}
+
+.profilePicBig {
+  width: 10rem;
+  border-radius: 100%;
+  height: auto;
+}
+

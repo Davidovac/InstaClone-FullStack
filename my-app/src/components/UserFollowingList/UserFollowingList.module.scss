@@ -1,0 +1,11 @@
+.userFollowingList {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.followingEntry {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}

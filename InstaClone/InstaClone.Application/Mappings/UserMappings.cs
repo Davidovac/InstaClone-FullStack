@@ -25,6 +25,12 @@ namespace InstaClone.Application.Mappings
                 });
 
             CreateMap<UserDto, User>().ReverseMap();
+
+            CreateMap<User, ProfileDto>()
+                .ForMember(dest => dest.ProfilePictureUrl, opt => opt.MapFrom(src => src.ProfilePicture));
+
+            CreateMap<User, UserSimpleDto>()
+                .ForMember(dest => dest.ProfilePictureUrl, opt => opt.MapFrom(src => src.ProfilePicture));
         }
     }
 }

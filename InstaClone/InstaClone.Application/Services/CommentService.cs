@@ -58,7 +58,7 @@ namespace InstaClone.Application.Services
             var post = await _postService.GetOneAsync(postId);
 
             var newComment = _mapper.Map<Comment>(comment);
-            newComment.PostId = postId;
+            newComment.PostId = post.Id;
             newComment.AuthorId = user.Id;
 
             await _unitOfWork.Comments.AddAsync(newComment);
@@ -69,12 +69,13 @@ namespace InstaClone.Application.Services
         public async Task<ReplyResponseDto> ReplyOnCommentOnThisPostAsync(Guid postId, Guid commentId, ReplyCreateRequestDto reply, ClaimsPrincipal claimsPrincipal)
         {
             var user = await _userService.GetByClaims(claimsPrincipal);
+            await _postService.GetOneAsync(postId);
+            var comment = await GetOneAsync(commentId);
 
-            var post = await _unitOfWork.Posts.GetOneAsync(postId);
-            if (post == null)
-                throw new NotFoundException("Post with id:" + postId.ToString());
-
-            var comment = await _unitOfWork.Comments.GetOneAsync(commentId);
+            if (comment.PostId != postId)
+            {
+                throw new BadRequestException("Comment and post do not match");
+            }
 
             var newReply = _mapper.Map<ReplyComment>(reply);
             newReply.RepliedCommentId = commentId;

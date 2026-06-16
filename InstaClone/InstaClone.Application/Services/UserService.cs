@@ -42,6 +42,118 @@ namespace InstaClone.Application.Services
             return userDto;
         }
 
+        public async Task<IReadOnlyList<UserSimpleDto>> GetFollowersByUser(Guid userId)
+        {
+            var user = await _userManager.Users
+                .Include(u => u.Followers)
+                .SingleOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+                throw new NotFoundException("User was not found.");
+
+            return _mapper.Map<IReadOnlyList<UserSimpleDto>>(user.Followers);
+        }
+
+        public async Task<IReadOnlyList<UserSimpleDto>> GetFollowingByUser(Guid userId)
+        {
+            var user = await _userManager.Users
+                .Include(u => u.Following)
+                .SingleOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                throw new NotFoundException("User was not found.");
+
+            return _mapper.Map<IReadOnlyList<UserSimpleDto>>(user.Following);
+        }
+
+        public async Task<ProfileDto> GetProfileAsync(string userName)
+        {
+            var user = await _userManager.Users
+                .Include(u => u.Followers)
+                .Include(u => u.Following)
+                .Include(u => u.Posts)
+                .SingleOrDefaultAsync(u => u.UserName == userName);
+
+            if (user == null)
+                throw new NotFoundException("User was not found.");
+
+            var userDto = _mapper.Map<ProfileDto>(user);
+
+            userDto.PostsCount = user.Posts.Count();
+            userDto.FollowerCount = user.Followers.Count();
+            userDto.FollowingCount = user.Following.Count();
+            return userDto;
+        }
+
+        public async Task FollowProfileAsync(string userName, ClaimsPrincipal claimsPrincipal)
+        {
+            try
+            {
+                var isFollowed = await FollowedProfileCheckAsync(userName, claimsPrincipal);
+                if (isFollowed)
+                {
+                    throw new BadRequestException("Can't follow followed profile");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            var profile = await _userManager.FindByNameAsync(userName);
+            var user = await _userManager.GetUserAsync(claimsPrincipal);
+
+            user!.Following.Add(profile!);
+            await _userManager.UpdateAsync(user);
+        }
+
+        public async Task UnfollowProfileAsync(string userName, ClaimsPrincipal claimsPrincipal)
+        {
+            try
+            {
+                var isFollowed = await FollowedProfileCheckAsync(userName, claimsPrincipal);
+                if (!isFollowed)
+                {
+                    throw new BadRequestException("Can't unfollow not followed profile");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            var profile = await _userManager.FindByNameAsync(userName);
+            var user = await _userManager.GetUserAsync(claimsPrincipal);
+
+            var fullUser = await _userManager.Users
+                .Include(u => u.Following)
+                .SingleOrDefaultAsync(u => u.Id == user!.Id);
+
+            user!.Following.Remove(profile!);
+            await _userManager.UpdateAsync(user);
+        }
+
+        public async Task<bool> FollowedProfileCheckAsync(string userName, ClaimsPrincipal claimsPrincipal)
+        {
+            var profile = await _userManager.FindByNameAsync(userName);
+
+            if (profile == null)
+                throw new NotFoundException("Profile was not found.");
+
+            var user = await _userManager.GetUserAsync(claimsPrincipal);
+            if (user == null)
+                throw new NotFoundException("User was not found.");
+
+            var userWithFollowing = await _userManager.Users
+                .Include(u => u.Following)
+                .SingleOrDefaultAsync(u => u.Id == user.Id);
+
+            if (user.Following.Any(f => f.Id == profile.Id))
+            {
+                return true;
+            }
+            return false;
+        }
+
         public async Task<UserDto> GetByClaims(ClaimsPrincipal claimsPrincipal)
         {
             var user = await _userManager.GetUserAsync(claimsPrincipal);
@@ -80,5 +192,6 @@ namespace InstaClone.Application.Services
                 throw new BadRequestException("User deletion failed.");
             }
         }
+
     }
 }

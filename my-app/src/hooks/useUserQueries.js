@@ -17,6 +17,7 @@ export function useGetUser(id) {
   });
 }
 
+
 export function useCreateUser() {
   const queryClient = useQueryClient();
 
@@ -65,6 +66,80 @@ export function useUpdateUser() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
+    },
+  });
+}
+
+export function useFollowProfile() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (userName) => {
+      try {
+        return await userService.followProfile(userName)
+      } catch (error) {
+        throw new Error(errorHandler(error));
+      }
+    },
+    onError: (error) => {
+      const backendMessage = error.response?.data?.message || "Something went wrong";
+      console.error(backendMessage);
+    }
+  });
+}
+
+export function useUnfollowProfile() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (userName) => {
+      try {
+        return await userService.unfollowProfile(userName)
+      } catch (error) {
+        throw new Error(errorHandler(error));
+      }
+    },
+    
+    onError: (error) => {
+      const backendMessage = error.response?.data?.message || "Something went wrong";
+      console.error(backendMessage);
+    }
+  });
+}
+
+export function useGetFollowersByUser(id) {
+  return useQuery({
+    queryKey: ['followers', id],
+    queryFn: async () => {
+      return await userService.getFollowersByUser(id);
+    },
+  });
+}
+
+export function useGetFollowingByUser(id) {
+  return useQuery({
+    queryKey: ['following', id],
+    queryFn: async () => {
+      return await userService.getFollowingByUser(id);
+    },
+  });
+}
+
+
+export function useFollowsProfile(userName) {
+  return useQuery({
+    queryKey: ['follows', userName],
+    queryFn: async () => {
+      return await userService.followsProfile(userName);
+    },
+  });
+}
+
+export function useGetProfile(userName) {
+  return useQuery({
+    queryKey: ['profile', userName],
+    queryFn: async () => {
+      return await userService.getProfile(userName);
     },
   });
 }

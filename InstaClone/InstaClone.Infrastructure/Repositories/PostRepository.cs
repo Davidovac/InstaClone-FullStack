@@ -20,6 +20,8 @@ namespace InstaClone.Infrastructure.Repositories
         {
             return await _dbContext.Posts
                 .Include(p => p.Author)
+                .Include(p => p.Comments)
+                .ThenInclude(c => c.ReplyComments)
                 .Where(p => p.Author.Followers.Any(f => f.Id == userId))
                 .OrderByDescending(p => p.CreatedAt)
                 .ToListAsync();

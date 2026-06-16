@@ -33,6 +33,54 @@ namespace InstaClone.Api.Controllers
             return Ok(user);
         }
 
+        [HttpGet("{id}/following")]
+        public async Task<IActionResult> GetFollowingByUserAsync(Guid id)
+        {
+            var following = await _userService.GetFollowingByUser(id);
+
+            return Ok(following);
+        }
+
+        [HttpGet("{id}/followers")]
+        public async Task<IActionResult> GetFollowersByUserAsync(Guid id)
+        {
+            var followers = await _userService.GetFollowersByUser(id);
+
+            return Ok(followers);
+        }
+
+        [HttpGet("{userName}/profile")]
+        public async Task<IActionResult> GetProfileAsync(string userName)
+        {
+            var user = await _userService.GetProfileAsync(userName);
+
+            return Ok(user);
+        }
+
+        [HttpPost("{userName}/follow-profile")]
+        public async Task<IActionResult> FollowProfileAsync(string userName)
+        {
+            await _userService.FollowProfileAsync(userName, User);
+
+            return Ok();
+        }
+
+        [HttpDelete("{userName}/unfollow-profile")]
+        public async Task<IActionResult> UnfollowProfileAsync(string userName)
+        {
+            await _userService.UnfollowProfileAsync(userName, User);
+
+            return Ok();
+        }
+
+        [HttpGet("{userName}/followed-profile-check")]
+        public async Task<IActionResult> FollowedProfileCheckAsync(string userName)
+        {
+            var check = await _userService.FollowedProfileCheckAsync(userName, User);
+
+            return Ok(check);
+        }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAsync(Guid id, [FromBody] UserUpdateRequestDto userData)
         {
