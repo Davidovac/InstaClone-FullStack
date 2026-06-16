@@ -11,6 +11,7 @@ import AccountPage from "./pages/AccountPage/AccountPage.jsx";
 import { RequireAuth, RedirectIfAuthenticated } from "./components/RouteGuards.jsx";
 import CreatePostPage from "./pages/CreatePostPage/CreatePost.jsx";
 import HomePage from "./pages/HomePage/HomePage.jsx";
+import ProfilePage from "./pages/ProfilePage/ProfilePage.jsx";
 
 const App = () => {
   return (
@@ -71,6 +72,14 @@ const App = () => {
               element={
                 <RequireAuth>
                   <AccountPage />
+                </RequireAuth>
+              }
+            />
+
+            <Route path="/profile"
+              element={
+                <RequireAuth>
+                  <ProfilePage />
                 </RequireAuth>
               }
             />

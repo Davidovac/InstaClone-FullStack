@@ -5,6 +5,7 @@ import PostEngagementDisplay from "../PostEngagementDisplay/PostEngagementDispla
 import SendCommentInput from "../SendCommentInput/SendCommentInput";
 import Avatar from "../AvatarComponent/Avatar.jsx";
 import { useCreateComment, useCreateReplyComment, useLikePost, useUnlikePost } from "../../hooks/usePostQueries.js";
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner.jsx";
 
 const PostCard = ({ post }) => {
   const [commentsShow, setCommentsShow] = useState(false);
@@ -15,7 +16,7 @@ const PostCard = ({ post }) => {
   const { mutate: createComment, isPending: isSavingComment, isError: isCreateCommentError, error: createCommentError } = useCreateComment();
   const { mutate: createReply, isPending: isSavingReply, isError: isCreateReplyError, error: createReplyError } = useCreateReplyComment();
   const { mutate: like, isPending: isSavingLike, isError: isLikeError, error: likeError } = useLikePost();
-  const { mutate: unlike, isPending: isDeletingLike, isError: isUnlikeError, error: enlikeError } = useUnlikePost();
+  const { mutate: unlike, isPending: isDeletingLike, isError: isUnlikeError, error: unlikeError } = useUnlikePost();
   const [action, setAction] = useState(null); // "like" | "unlike" | null
   const timeoutRef = useRef(null);
   const [isActuallyLiked, setIsActuallyLiked] = useState(false);
@@ -41,18 +42,18 @@ const PostCard = ({ post }) => {
 
     timeoutRef.current = window.setTimeout(async () => {
       if (action === "like") {
-        await like(post.id), {
+        await like(post.id, {
           onSuccess: () => {
             setIsActuallyLiked(true);
           }
-        }
+        })
       }
       if (action === "unlike") {
-        await unlike(post.id), {
+        await unlike(post.id, {
           onSuccess: () => {
             setIsActuallyLiked(false);
           }
-        }
+        })
       }
       setAction(null);
       timeoutRef.current = null;
@@ -80,12 +81,12 @@ const PostCard = ({ post }) => {
   
   const handleSendComment = async () => {
     if (!isReply) {
-      await createComment({ postId: post.id, data: typedComment }), {
+      await createComment({ postId: post.id, data: typedComment }, {
         onSuccess: (data) => {
           setTypedComment("");
           post.comments.push(data);
         }
-      };
+      });
     }
     else {
       handleSendReply()
@@ -93,7 +94,7 @@ const PostCard = ({ post }) => {
   }
 
   const handleSendReply = async () => {
-    await createReply({postId: post.id, commentId: repliedCommentId, data: typedComment }) , {
+    await createReply({postId: post.id, commentId: repliedCommentId, data: typedComment }, {
       onSuccess: (data) => {
         setTypedReply("");
         post.comments.find(c => c.id == commentId).replies.push(data);
@@ -103,8 +104,7 @@ const PostCard = ({ post }) => {
         setIsReply(false);
         setRepliedCommentAuthorName(null);
       }
-    }
-    
+    })
   }
 
   const handleReplyAction = (parentId, authorName) => {
@@ -113,7 +113,8 @@ const PostCard = ({ post }) => {
     setRepliedCommentAuthorName(!authorName ? null : authorName);
   }
 
-  return(
+  if (isSavingComment || isSavingLike || isSavingReply || isDeletingLike) return <LoadingSpinner />
+  return (
     <div className={styles.postCard}>
       <div className={styles.header}>
         <Avatar avatar={post?.authorPictureUrl} />
@@ -137,8 +138,7 @@ const PostCard = ({ post }) => {
       <div className={styles.commentsSectionContainer}>
         {commentsShow && <CommentsSection comments={post?.comments} replyAction={handleReplyAction}/>}
         <SendCommentInput comment={typedComment} setComment={setTypedComment} 
-        onSend={handleSendComment} repliedCommentAuthorName={repliedCommentAuthorName}
-        isReply={isReply}/>
+        onSend={handleSendComment} repliedCommentAuthorName={repliedCommentAuthorName}/>
       </div>
     </div>
   );

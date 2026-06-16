@@ -12,6 +12,7 @@ namespace InstaClone.Application.DTOs.CommentDTOs
     public class CommentResponseDto
     {
         public Guid Id { get; set; }
+        public Guid PostId { get; set; }
         public string Text { get; set; }
         public string AuthorName { get; set; }
         public string AuthorPictureUrl { get; set; } = string.Empty;

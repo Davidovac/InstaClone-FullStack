@@ -18,13 +18,15 @@ namespace InstaClone.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
+        private readonly IPostService _postService;
         private readonly IMapper _mapper;
 
-        public LikeService(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService)
+        public LikeService(IUnitOfWork unitOfWork, IMapper mapper, IUserService userService, IPostService postService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userService = userService;
+            _postService = postService;
         }
 
         public async Task<IReadOnlyList<LikeResponseDto>> GetAllAsync()
@@ -45,11 +47,11 @@ namespace InstaClone.Application.Services
         public async Task LikePostAsync(Guid postId, ClaimsPrincipal claimsPrincipal)
         {
             var userDto = await _userService.GetByClaims(claimsPrincipal);
-            var post = await _unitOfWork.Posts.GetOneAsync(postId);
+            var post = await _postService.GetOneAsync(postId);
 
             Like like = new Like
             {
-                PostId = postId,
+                PostId = post.Id,
                 LikerId = userDto.Id
             };
 
@@ -58,12 +60,18 @@ namespace InstaClone.Application.Services
         }
         public async Task UnlikePostAsync(Guid postId, ClaimsPrincipal claimsPrincipal)
         {
-            var userDto = await _userService.GetByClaims(claimsPrincipal);
+            var user = await _userService.GetByClaims(claimsPrincipal);
             var post = await _unitOfWork.Posts.GetOneAsync(postId);
-            var like = await _unitOfWork.Likes.GetOneByUserAndPostAsync(postId, userDto.Id);
+            var like = await _unitOfWork.Likes.GetOneByUserAndPostAsync(postId, user.Id);
 
             if (like == null)
                 throw new NotFoundException("Like");
+
+            if (like.LikerId != user.Id)
+                throw new BadRequestException("Liker id and user id do not match.");
+
+            if (like.PostId != post.Id)
+                throw new BadRequestException("Like's post id do not match given post id.");
 
             post.Likes.Remove(like);
             _unitOfWork.Likes.Delete(like);
