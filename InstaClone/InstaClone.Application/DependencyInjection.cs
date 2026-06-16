@@ -23,6 +23,9 @@ namespace InstaClone.Application
             });
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IPostService, PostService>();
+            services.AddScoped<ICommentService, CommentService>();
+            services.AddScoped<ILikeService, LikeService>();
             services.Configure<FrontendOptions>(
                  configuration.GetSection("FrontendOptions"));
 

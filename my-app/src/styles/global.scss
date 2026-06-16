@@ -1,5 +1,5 @@
 html, body, #root {
-  height: 100vh;
+  height: 100%;
   font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   background-color: #fcf5e8;
   margin: 0;
@@ -66,4 +66,9 @@ button {
 #main-container {
   display: flex;
   height: 100%;
+}
+
+.content-wrapper {
+  margin-left: 19rem;
+  flex-grow: 1;
 }

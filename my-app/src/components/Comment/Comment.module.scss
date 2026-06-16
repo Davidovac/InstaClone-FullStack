@@ -1,0 +1,24 @@
+.comment {
+  display: flex;
+  flex-direction: column;
+
+  .commentContent {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .commentFooter {
+    margin-bottom: 0.4rem;
+    button {
+      background: none;
+      border: none;
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+
+  .repliesContainer {
+    padding-left: 3rem;
+  }
+}

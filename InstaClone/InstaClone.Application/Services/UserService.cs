@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -39,6 +40,15 @@ namespace InstaClone.Application.Services
 
             var userDto = _mapper.Map<UserDto>(user);
             return userDto;
+        }
+
+        public async Task<UserDto> GetByClaims(ClaimsPrincipal claimsPrincipal)
+        {
+            var user = await _userManager.GetUserAsync(claimsPrincipal);
+            if (user == null)
+                throw new UnauthorizedAccessException();
+
+            return _mapper.Map<UserDto>(user);
         }
 
         public async Task<UserDto> UpdateAsync(Guid id, UserUpdateRequestDto userData)

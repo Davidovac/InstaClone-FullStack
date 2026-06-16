@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { userService } from '../services/user.service';
-import { errorHandler } from './handlers/errorHandler';
 
 export function useGetUsers(queryUsername = "") {
   return useQuery({
@@ -12,13 +11,8 @@ export function useGetUsers(queryUsername = "") {
 export function useGetUser(id) {
   return useQuery({
     queryKey: ['user', id],
-    queryFn: async({ signal }) => {
-      try {
-        return await userService.getById(id, signal);
-      }
-      catch (error) {
-        throw new Error(errorHandler(error));
-      }
+    queryFn: async () => {
+      return await userService.getById(id);
     },
   });
 }
@@ -37,11 +31,7 @@ export function useCreateUser() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
     },
-    onError: (error) => {
-      const backendMessage = error.response?.data?.message || "Something went wrong";
-      console.error(backendMessage);
-    }
-  });
+ })
 }
 
 export function useDeleteUser() {

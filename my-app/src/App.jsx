@@ -9,6 +9,8 @@ import ResetPasswordPage from "./pages/ResetPasswordPage/ResetPasswordPage.jsx";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage/ForgotPasswordPage.jsx";
 import AccountPage from "./pages/AccountPage/AccountPage.jsx";
 import { RequireAuth, RedirectIfAuthenticated } from "./components/RouteGuards.jsx";
+import CreatePostPage from "./pages/CreatePostPage/CreatePost.jsx";
+import HomePage from "./pages/HomePage/HomePage.jsx";
 
 const App = () => {
   return (
@@ -16,58 +18,73 @@ const App = () => {
       <div id="main-container">
         <Sidebar/>
 
-        <Routes>
-          <Route path="/" element={<h1>Home Page</h1>} />
+        <div className="content-wrapper">
+          <Routes>
+            <Route path="/" element={
+              <RequireAuth>
+                  <HomePage />
+                </RequireAuth>
+            } />
 
-          <Route path="/login"
-            element={
-              <RedirectIfAuthenticated>
-                <LoginPage />
-              </RedirectIfAuthenticated>
-            }
-          />
+            <Route path="/login"
+              element={
+                <RedirectIfAuthenticated>
+                  <LoginPage />
+                </RedirectIfAuthenticated>
+              }
+            />
 
-          <Route path="/register"
-            element={
-              <RedirectIfAuthenticated>
-                <RegisterPage />
-              </RedirectIfAuthenticated>
-            }
-          />
+            <Route path="/register"
+              element={
+                <RedirectIfAuthenticated>
+                  <RegisterPage />
+                </RedirectIfAuthenticated>
+              }
+            />
 
-          <Route path="/activate-account" 
-            element={
-              <RedirectIfAuthenticated>
-                <ActivateAccount />
-              </RedirectIfAuthenticated>
-            } 
-          />
-
-          <Route path="/forgot-password" 
-            element={
-              <RedirectIfAuthenticated>
-                <ForgotPasswordPage />
-              </RedirectIfAuthenticated>
+            <Route path="/activate-account" 
+              element={
+                <RedirectIfAuthenticated>
+                  <ActivateAccount />
+                </RedirectIfAuthenticated>
               } 
             />
-            
-          <Route path="/reset-password"
-          element={
-            <RedirectIfAuthenticated>
-              <ResetPasswordPage />
-            </RedirectIfAuthenticated>
 
-           } 
-          />
-
-          <Route path="/account"
+            <Route path="/forgot-password" 
+              element={
+                <RedirectIfAuthenticated>
+                  <ForgotPasswordPage />
+                </RedirectIfAuthenticated>
+                } 
+              />
+              
+            <Route path="/reset-password"
             element={
-              <RequireAuth>
-                <AccountPage />
-              </RequireAuth>
-            }
-          />
-        </Routes>
+              <RedirectIfAuthenticated>
+                <ResetPasswordPage />
+              </RedirectIfAuthenticated>
+
+            } 
+            />
+
+            <Route path="/account"
+              element={
+                <RequireAuth>
+                  <AccountPage />
+                </RequireAuth>
+              }
+            />
+
+            <Route path="/create-post"
+              element={
+                <RequireAuth>
+                  <CreatePostPage />
+                </RequireAuth>
+              }
+            />
+            
+          </Routes>
+        </div>
       </div>
     </BrowserRouter>
   );

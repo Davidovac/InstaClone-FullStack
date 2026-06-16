@@ -14,7 +14,7 @@ const ResetPasswordPage = () => {
   const { register, handleSubmit, watch, formState: {errors} } = useForm();
   const { mutate: resetPassword, isPending: isSaving, isError: isResetPassError, error: resetPassError } = useResetPassword();
   const navigate = useNavigate();
-  const password = watch("password");
+  const password = watch("newPassword");
 
   const onResetPassword = async (data, e) => {
     e.preventDefault();
@@ -32,7 +32,7 @@ const ResetPasswordPage = () => {
     <div id={styles.resetPasswordContainer}>
       <h2>Reset Password</h2>
       <form onSubmit={handleSubmit(onResetPassword)}>
-        <InputComponent iName="password" label="Password" iType="password"
+        <InputComponent iName="newPassword" label="New Password" iType="password"
           validateBool={true}
           validateType="password"
           register={register}

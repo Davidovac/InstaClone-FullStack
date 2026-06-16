@@ -35,6 +35,12 @@ const Sidebar = ({ setUsers }) => {
               Account
             </NavLink>
           </li>}
+
+          {token && <li>
+            <NavLink to="/create-post" className={navLinkClass}>
+              Create Post
+            </NavLink>
+          </li>}
         </ul>
 
         <ul className={styles.navListDown}>

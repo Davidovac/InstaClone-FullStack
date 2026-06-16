@@ -1,5 +1,6 @@
 ﻿using InstaClone.Application.Interfaces;
 using InstaClone.Domain.Interfaces;
+using InstaClone.Infrastructure.Repositories;
 using InstaClone.Infrastructure.Services;
 using InstaClone.Infrastructure.Settings;
 using Microsoft.AspNetCore.Builder.Extensions;
@@ -22,6 +23,10 @@ namespace InstaClone.Infrastructure
             services.Configure<EmailSenderSettings>(configuration.GetSection(EmailSenderSettings.SectionName));
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<ILocalImageStorageService, LocalImageStorageService>();
+            services.AddScoped<IPostRepository, PostRepository>();
+            services.AddScoped<ILikeRepository, LikeRepository>();
+            services.AddScoped<ICommentRepository, CommentRepository>();
 
             services.Configure<ConnectionOptions>(
                 configuration.GetSection("ConnectionStrings"));

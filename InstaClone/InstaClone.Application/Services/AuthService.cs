@@ -175,11 +175,11 @@ namespace InstaClone.Application.Services
                 <p>Ako link ne radi, iskopirajte ovu adresu u Vaš pretraživač:</p>
                 <p>{resetLink}</p>";
 
-                await _emailSender.SendEmailAsync(user.Email, emailSubject, htmlMessage);
+                await _emailSender.SendEmailAsync(user.Email!, emailSubject, htmlMessage);
             }
             catch (Exception ex)
             {
-                throw new Exception("Error while trying to send a password reset email or with frontend url setting.");
+                throw new Exception("Error while trying to send a password reset email or with frontend url setting.", ex);
             }
         }
 
